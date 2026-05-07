@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Omar Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Cairo", "sans-serif"] },
+            colors: { brand: { blue: "#1e3a8a", light: "#3b82f6" } },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Cairo", sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+      }
+      .view-section {
+        display: none;
+      }
+      .view-section.active {
+        display: block;
+      }
+      .nav-link.active {
+        background-color: #1e3a8a;
+        color: white;
+      }
+      .nav-link {
+        background-color: transparent;
+        color: #475569;
+      }
+      .nav-link:hover:not(.active) {
+        background-color: #e2e8f0;
+      }
+      @media print {
+        @page {
+          size: A4 portrait;
+          margin: 10mm;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .print-only {
+          display: block !important;
+        }
+        body {
+          background: white;
+          padding: 0;
+          margin: 0;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        .view-section {
+          display: none !important;
+        }
+        #view-reports {
+          display: block !important;
+        }
+        #printable-report {
+          direction: rtl !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          font-family: inherit !important;
+        }
+        #app-content {
+          margin-left: 0 !important;
+          width: 100% !important;
+          padding: 0 !important;
+        }
+        #main-sidebar {
+          display: none !important;
+        }
+        table {
+          border-collapse: collapse !important;
+          width: 100% !important;
+          font-size: 10px !important;
+          line-height: 1.2 !important;
+        }
+        th,
+        td {
+          border: 1px solid #9ca3af !important;
+          border-width: 1px !important;
+          padding: 2px 4px !important;
+          height: auto !important;
+        }
+        tr {
+          height: 22px !important;
+        }
+        table input[type="text"],
+        table input[type="time"] {
+          border: none !important;
+          background: transparent !important;
+          margin: 0;
+          padding: 0;
+          box-shadow: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="flex flex-col md:flex-row min-h-screen">
+    <aside class="w-full md:w-64 bg-white shadow-lg no-print flex flex-col">
+      <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+        <div
+          class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center text-white font-bold text-xl"
+        >
+          HR
+        </div>
+        <h1 class="font-bold text-xl text-gray-800">Omar Attendance</h1>
+      </div>
+      <nav class="flex-1 p-4 space-y-2">
+        <button
+          onclick="navigate('dashboard')"
+          id="nav-dashboard"
+          class="nav-link active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          الرئيسية
+        </button>
+        <button
+          onclick="navigate('employees')"
+          id="nav-employees"
+          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          إدارة الموظفين
+        </button>
+        <button
+          onclick="navigate('import')"
+          id="nav-import"
+          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          رفع الإكسيل
+        </button>
+        <button
+          onclick="navigate('reports')"
+          id="nav-reports"
+          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          التقارير التفصيلية
+        </button>
+        <button
+          onclick="navigate('manual')"
+          id="nav-manual"
+          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          إدخال حضور وانصراف (يدوي)
+        </button>
+        <button
+          onclick="navigate('settings')"
+          id="nav-settings"
+          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
+        >
+          الإعدادات
+        </button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto print-w-full print:p-0">
+      <section id="view-dashboard" class="view-section active space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
+          >
+            <h3 class="text-gray-500 font-medium">إجمالي الموظفين</h3>
+            <p
+              class="text-3xl font-bold text-brand-blue mt-2"
+              id="stat-total-emp"
+            >
+              0
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
+          >
+            <h3 class="text-gray-500 font-medium">إجمالي السجلات</h3>
+            <p
+              class="text-3xl font-bold text-green-600 mt-2"
+              id="stat-total-att"
+            >
+              0
+            </p>
+          </div>
+        </div>
+        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+          <h3 class="font-bold text-blue-800 text-lg mb-2">تعليمات</h3>
+          <p class="text-blue-700">
+            جميع البيانات تحفظ تلقائياً وبشكل محلي على متصفحك (Offline). انتقل
+            الى الإعدادات لتصدير نسخة احتياطية من هذا الملف مع بياناتك.
+          </p>
+        </div>
+      </section>
+
+      <section id="view-employees" class="view-section space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">إدارة الموظفين</h2>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <form
+            id="emp-form"
+            onsubmit="saveEmployee(event)"
+            class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+          >
+            <input type="hidden" id="emp-sys-id" />
+            <div>
+              <label class="block text-sm font-medium mb-1"
+                >الرقم الوظيفي (ID)</label
+              >
+              <input
+                type="text"
+                id="emp-id"
+                required
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+                placeholder="مثال: 1001"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">الاسم</label>
+              <input
+                type="text"
+                id="emp-name"
+                required
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+                placeholder="اسم الموظف"
+              />
+            </div>
+            <button
+              type="submit"
+              class="bg-brand-blue text-white rounded-lg p-2 font-bold hover:bg-blue-900 h-10 w-full mb-[2px]"
+            >
+              حفظ
+            </button>
+          </form>
+        </div>
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+        >
+          <table class="w-full text-right">
+            <thead class="bg-gray-50 text-gray-600 border-b">
+              <tr>
+                <th class="p-4 font-semibold">ID</th>
+                <th class="p-4 font-semibold">الاسم</th>
+                <th class="p-4 font-semibold text-center w-32">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="emp-table-body" class="divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-import" class="view-section space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">رفع حضور إكسيل</h2>
+        <div
+          class="bg-white p-8 rounded-2xl border-2 border-brand-light border-dashed text-center hover:bg-blue-50 transition"
+        >
+          <label class="cursor-pointer block space-y-4">
+            <div
+              class="text-brand-light mx-auto w-16 h-16 flex items-center justify-center"
+            >
+              <svg
+                class="w-12 h-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-brand-blue">اختر ملف إكسيل</h3>
+            <p class="text-gray-600">
+              الأعمدة المطلوبة: <b>id</b>, <b>name</b>, <b>date</b>, <b>in</b>,
+              <b>out</b>
+            </p>
+            <input
+              type="file"
+              accept=".xlsx, .xls, .csv"
+              class="hidden"
+              onchange="handleExcelUpload(event)"
+            />
+            <span
+              class="inline-block bg-brand-light text-white px-6 py-2 rounded-lg font-bold mt-2 hover:bg-brand-blue transition"
+              >استعراض الملفات</span
+            >
+          </label>
+        </div>
+        <div
+          id="import-logs"
+          class="bg-gray-900 text-green-400 p-4 rounded-xl font-mono text-sm max-h-40 overflow-auto hidden dir-ltr text-left"
+        ></div>
+        <div
+          id="import-preview-wrapper"
+          class="hidden bg-white rounded-2xl shadow-sm border overflow-hidden"
+        >
+          <h3 class="bg-gray-50 p-4 border-b font-bold text-gray-800">
+            معاينة البيانات
+          </h3>
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-right whitespace-nowrap">
+              <thead class="bg-gray-50 border-b sticky top-0 shadow-sm">
+                <tr>
+                  <th class="p-3">ID</th>
+                  <th class="p-3">Name</th>
+                  <th class="p-3">Date</th>
+                  <th class="p-3">In</th>
+                  <th class="p-3">Out</th>
+                </tr>
+              </thead>
+              <tbody id="import-preview-body" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-reports" class="view-section space-y-6">
+        <div class="no-print space-y-4">
+          <h2 class="text-2xl font-bold text-gray-800">
+            التقارير اليومية والشهرية
+          </h2>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+          >
+            <div>
+              <label class="block text-sm font-medium mb-1">الموظف</label>
+              <select
+                id="report-emp"
+                class="w-full border rounded-lg p-2 outline-none focus:border-brand-blue text-sm"
+              ></select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">من</label
+              ><input
+                type="date"
+                id="report-start"
+                class="w-full border rounded-lg p-2 outline-none text-sm focus:border-brand-blue"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">إلى</label
+              ><input
+                type="date"
+                id="report-end"
+                class="w-full border rounded-lg p-2 outline-none text-sm focus:border-brand-blue"
+              />
+            </div>
+            <div class="flex gap-2">
+              <button
+                onclick="generateReport()"
+                class="flex-1 bg-brand-blue text-white rounded-lg p-2 font-bold hover:bg-blue-900"
+              >
+                عرض
+              </button>
+              <button
+                onclick="window.print()"
+                class="bg-gray-600 text-white rounded-lg p-2 font-bold hover:bg-gray-700"
+              >
+                طباعة
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="printable-report"
+          dir="rtl"
+          class="bg-white p-4 print:p-0 min-h-[500px] hidden rounded-2xl shadow border border-gray-100 print:border-none print:shadow-none"
+        >
+          <div class="text-center mb-1 border-b-2 border-brand-blue pb-1 print:mb-1">
+            <h1 class="text-lg font-bold text-gray-900 mb-0 tracking-tight print:text-base">تقرير الحضور والانصراف الشهري</h1>
+            <p class="text-[10px] text-gray-500 font-medium">تاريخ الطباعة: <span id="print-date-top"></span></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mb-1 text-[10px] font-bold text-gray-800 bg-gray-50 p-2 rounded-lg print:bg-white print:p-0 print:mb-1 print:border-b print:rounded-none">
+            <div class="space-y-1">
+              <p class="flex items-center gap-2">اسم الموظف: <span class="font-semibold text-brand-blue" id="print-emp-name"></span></p>
+              <p class="flex items-center gap-2">رقم الموظف: <span class="font-semibold text-brand-blue" id="print-emp-id"></span></p>
+              <p class="flex items-center gap-2">الشهر: <span class="font-semibold text-brand-blue" id="print-month"></span></p>
+            </div>
+            <div class="space-y-1 text-left">
+              <p>الفترة: <span class="font-semibold text-brand-blue" id="print-period" dir="ltr"></span></p>
+              <p>الوردية: <span class="font-semibold text-brand-blue" id="print-shift"></span></p>
+            </div>
+          </div>
+
+          <!-- Inline edit table -->
+          <div class="overflow-x-auto print:overflow-visible">
+            <table
+              class="w-full text-center border-collapse border border-gray-400 min-w-[700px] print:min-w-full print:text-[8pt]"
+            >
+              <thead class="bg-gray-100 font-bold border-b-2 border-gray-400">
+                <tr>
+                  <th class="border border-gray-400 p-1.5 w-8 print:p-0.5">م</th>
+                  <th class="border border-gray-400 p-1.5 w-20 print:p-0.5">التاريخ</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">اليوم</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">دخول</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">خروج</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">العمل</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">تأخير</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">مبكر</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">خصم</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">إضافي</th>
+                  <th class="border border-gray-400 p-1.5 print:p-0.5">ملاحظات</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body"></tbody>
+              <tfoot class="no-print bg-gray-50">
+                <tr>
+                  <td
+                    colspan="3"
+                    class="p-2 border font-bold text-right"
+                    dir="rtl"
+                  >
+                    إضافة يدوي:
+                  </td>
+                  <td class="p-1 border bg-white">
+                    <input
+                      type="time"
+                      id="man-in"
+                      class="w-full p-1 border rounded text-center"
+                    />
+                  </td>
+                  <td class="p-1 border bg-white">
+                    <input
+                      type="time"
+                      id="man-out"
+                      class="w-full p-1 border rounded text-center"
+                    />
+                  </td>
+                  <td colspan="5" class="border p-1 bg-white" dir="rtl">
+                    <div class="flex gap-1" dir="rtl">
+                      <select
+                        id="man-type"
+                        class="w-1/2 p-1 border rounded text-xs"
+                      >
+                        <option value="">-</option>
+                        <option value="إجازة">إجازة</option>
+                        <option value="مرضي">مرضي</option>
+                        <option value="إذن">إذن</option>
+                        <option value="مأمورية">مأمورية</option>
+                        <option value="غياب">غياب</option>
+                      </select>
+                      <input
+                        type="date"
+                        id="man-date"
+                        class="w-1/2 p-1 border rounded text-xs"
+                      />
+                    </div>
+                  </td>
+                  <td class="border p-1">
+                    <button
+                      onclick="addManualRecord()"
+                      class="bg-brand-blue text-white p-1 rounded font-bold w-full text-xs"
+                    >
+                      حفظ
+                    </button>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="flex flex-col md:flex-row justify-between items-start gap-6 mt-4 print:mt-2">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full md:w-auto">
+              <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 print:bg-white print:border-none print:p-0">
+                <div class="w-1.5 h-10 bg-green-500 rounded-full"></div>
+                <div>
+                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">أيام الحضور</p>
+                  <p id="sum-p" class="text-lg font-bold text-slate-800 leading-tight">0</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 print:bg-white print:border-none print:p-0">
+                <div class="w-1.5 h-10 bg-red-500 rounded-full"></div>
+                <div>
+                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">أيام الغياب</p>
+                  <p id="sum-a" class="text-lg font-bold text-slate-800 leading-tight">0</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 print:bg-white print:border-none print:p-0">
+                <div class="w-1.5 h-10 bg-orange-400 rounded-full"></div>
+                <div>
+                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">إجمالي الخصم</p>
+                  <p id="sum-d" class="text-lg font-bold text-slate-800 leading-tight">0</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 print:bg-white print:border-none print:p-0">
+                <div class="w-1.5 h-10 bg-indigo-500 rounded-full"></div>
+                <div>
+                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">صافي الإضافي</p>
+                  <p id="sum-o" class="text-lg font-bold text-slate-800 leading-tight">0:00</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-56 shrink-0 print:w-48">
+              <table
+                class="border-collapse border border-gray-400 w-full text-center bg-white text-xs print:border-gray-800"
+              >
+                <thead class="bg-gray-100 font-bold print:bg-gray-200">
+                  <tr>
+                    <th class="border border-gray-400 print:border-gray-800 p-1.5">نوع المغادرة</th>
+                    <th class="border border-gray-400 print:border-gray-800 p-1.5">العدد</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-bold text-right">إجازة سنوية</td>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-semibold text-brand-blue" id="c-annual">0</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-bold text-right">مرضي</td>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-semibold text-brand-blue" id="c-sick">0</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-bold text-right">خصم (Discounted)</td>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-semibold text-brand-blue" id="c-disc">0</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-bold text-right">إذن خاص</td>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-semibold text-brand-blue" id="c-excuse">0</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-bold text-right">مأمورية عمل</td>
+                    <td class="border border-gray-400 print:border-gray-800 p-1.5 font-semibold text-brand-blue" id="c-mission">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="view-manual" class="view-section space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">
+          إدخال حضور وانصراف يدوي
+        </h2>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <form
+            id="man-att-form"
+            onsubmit="saveManualAtt(event)"
+            class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end"
+          >
+            <div>
+              <label class="block text-sm font-medium mb-1">الموظف</label>
+              <select
+                id="man-att-emp"
+                required
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              ></select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">التاريخ</label>
+              <input
+                type="date"
+                id="man-att-date"
+                required
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">وقت الدخول</label>
+              <input
+                type="time"
+                id="man-att-in"
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">وقت الخروج</label>
+              <input
+                type="time"
+                id="man-att-out"
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1"
+                >النوع / الحالة</label
+              >
+              <select
+                id="man-att-type"
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              >
+                <option value="">حضور عادي</option>
+                <option value="إجازة">إجازة</option>
+                <option value="مرضي">مرضي</option>
+                <option value="إذن">إذن</option>
+                <option value="مأمورية">مأمورية</option>
+                <option value="غياب">غياب</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium mb-1">ملاحظة</label>
+              <input
+                type="text"
+                id="man-att-note"
+                placeholder="أضف ملاحظات (اختياري)"
+                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+              />
+            </div>
+            <button
+              type="submit"
+              class="bg-brand-blue text-white rounded-lg p-2 font-bold hover:bg-blue-900 h-10 w-full mb-[2px]"
+            >
+              حفظ الإدخال
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section id="view-settings" class="view-section space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">الإعدادات</h2>
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border max-w-sm space-y-4"
+        >
+          <div>
+            <label class="block text-sm mb-1 font-medium">دوام من:</label
+            ><input
+              type="time"
+              id="s-start"
+              class="w-full p-2 border rounded-lg outline-none focus:border-brand-blue"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-1 font-medium">دوام إلى:</label
+            ><input
+              type="time"
+              id="s-end"
+              class="w-full p-2 border rounded-lg outline-none focus:border-brand-blue"
+            />
+          </div>
+          <button
+            onclick="saveSettings()"
+            class="w-full bg-brand-blue text-white p-2 rounded-lg font-bold"
+          >
+            حفظ التغييرات
+          </button>
+          <hr class="my-4" />
+          <button
+            onclick="exportDB()"
+            class="w-full bg-yellow-600 hover:bg-yellow-700 text-white p-2 rounded-lg font-bold text-sm"
+          >
+            تصدير نسخة احتياطية للبيانات (JSON)
+          </button>
+          <label
+            class="block w-full bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg font-bold text-sm text-center cursor-pointer"
+          >
+            استعادة نسخة احتياطية (JSON)
+            <input
+              type="file"
+              accept=".json"
+              class="hidden"
+              onchange="importDB(event)"
+            />
+          </label>
+          <hr class="my-4" />
+          <button
+            onclick="downloadSelf()"
+            class="w-full bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg font-bold text-sm"
+          >
+            حفظ البرنامج والبيانات كملف واحد (Download)
+          </button>
+          <button
+            onclick="
+              if (confirm('مسح كل البيانات؟')) {
+                localStorage.clear();
+                location.reload();
+              }
+            "
+            class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg font-bold text-sm"
+          >
+            مسح قاعدة البيانات
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      let db = {
+        emps: JSON.parse(localStorage.getItem("hr_e") || "[]"),
+        atts: JSON.parse(localStorage.getItem("hr_a") || "[]"),
+        set: JSON.parse(
+          localStorage.getItem("hr_s") || '{"in":"09:00","out":"17:00"}',
+        ),
+      };
+
+      const saveDB = () => {
+        localStorage.setItem("hr_e", JSON.stringify(db.emps));
+        localStorage.setItem("hr_a", JSON.stringify(db.atts));
+        localStorage.setItem("hr_s", JSON.stringify(db.set));
+        document.getElementById("stat-total-emp").innerText = db.emps.length;
+        document.getElementById("stat-total-att").innerText = db.atts.length;
+      };
+
+      function navigate(to) {
+        document
+          .querySelectorAll(".view-section")
+          .forEach((e) => e.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-link")
+          .forEach((e) => e.classList.remove("active"));
+        document.getElementById("view-" + to).classList.add("active");
+        document.getElementById("nav-" + to).classList.add("active");
+        if (to === "employees") renderEmps();
+        if (to === "reports") {
+          document.getElementById("report-emp").innerHTML =
+            '<option value="">اختر موظف</option>' +
+            db.emps
+              .map(
+                (e) =>
+                  `<option value="${e.id}">${e.empId} - ${e.name}</option>`,
+              )
+              .join("");
+        }
+        if (to === "manual") {
+          document.getElementById("man-att-emp").innerHTML =
+            '<option value="">اختر موظف</option>' +
+            db.emps
+              .map(
+                (e) =>
+                  `<option value="${e.id}">${e.empId} - ${e.name}</option>`,
+              )
+              .join("");
+          if (!document.getElementById("man-att-date").value) {
+            document.getElementById("man-att-date").value = new Date()
+              .toISOString()
+              .split("T")[0];
+          }
+        }
+        if (to === "settings") {
+          document.getElementById("s-start").value = db.set.in || "09:00";
+          document.getElementById("s-end").value = db.set.out || "17:00";
+        }
+      }
+
+      const formatT = (m) =>
+        m
+          ? `${Math.floor(m / 60)}:${(m % 60).toString().padStart(2, "0")}`
+          : "";
+      const parseT = (str) => {
+        if (!str) return 0;
+        let p = String(str).split(":");
+        let h = parseInt(p[0]) || 0;
+        let m = parseInt(p[1]) || 0;
+        return h * 60 + m;
+      };
+
+      function saveEmployee(e) {
+        e.preventDefault();
+        let nId = document.getElementById("emp-sys-id").value;
+        let i = document.getElementById("emp-id").value;
+        let n = document.getElementById("emp-name").value;
+        if (nId) {
+          let obj = db.emps.find((x) => x.id == nId);
+          if (obj) {
+            obj.empId = i;
+            obj.name = n;
+          }
+        } else {
+          db.emps.push({
+            id: Math.random().toString(36).substr(2, 9),
+            empId: i,
+            name: n,
+          });
+        }
+        e.target.reset();
+        document.getElementById("emp-sys-id").value = "";
+        saveDB();
+        renderEmps();
+      }
+
+      function renderEmps() {
+        document.getElementById("emp-table-body").innerHTML = db.emps
+          .map(
+            (e) => `
+                <tr class="hover:bg-gray-50"><td class="p-4 border-b font-medium">${e.empId}</td><td class="p-4 border-b">${e.name}</td>
+                <td class="p-4 border-b text-center"><button onclick="editE('${e.id}')" class="text-blue-600 ml-2">تعديل</button><button onclick="delE('${e.id}')" class="text-red-600">حذف</button></td></tr>
+            `,
+          )
+          .join("");
+      }
+      function delE(id) {
+        if (confirm("متأكد؟")) {
+          db.emps = db.emps.filter((e) => e.id !== id);
+          saveDB();
+          renderEmps();
+        }
+      }
+      function editE(id) {
+        let obj = db.emps.find((e) => e.id == id);
+        if (obj) {
+          document.getElementById("emp-sys-id").value = id;
+          document.getElementById("emp-id").value = obj.empId;
+          document.getElementById("emp-name").value = obj.name;
+        }
+      }
+
+      function handleExcelUpload(e) {
+        let logsEl = document.getElementById("import-logs");
+        logsEl.classList.remove("hidden");
+        let prevBody = document.getElementById("import-preview-body");
+        logsEl.innerHTML = "> جاري القراءة...<br>";
+        const file = e.target.files[0];
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = (evt) => {
+          const workbook = XLSX.read(new Uint8Array(evt.target.result), {
+            type: "array",
+            cellDates: true,
+          });
+          const data = XLSX.utils.sheet_to_json(
+            workbook.Sheets[workbook.SheetNames[0]],
+          );
+          let added = 0;
+          let html = "";
+
+          let getGlobal = (row, ks) => {
+            let k = Object.keys(row).find((x) => {
+              let cleanKey = x
+                .toLowerCase()
+                .trim()
+                .replace(/[\n\r]+/g, "");
+              return ks.some((target) => {
+                if (cleanKey === target) return true;
+                let regex = new RegExp("\\b" + target + "\\b");
+                return regex.test(cleanKey);
+              });
+            });
+            return k ? row[k] : "";
+          };
+
+          // Auto-detect if string dates are MM/DD or DD/MM based on the whole file
+          let isMMDD = false; // default to DD/MM
+          for (let r of data) {
+            let dOrig = getGlobal(r, ["date", "يوم", "التاريخ", "تاريخ"]);
+            if (typeof dOrig === "string") {
+              let parts = dOrig.trim().split(/[\/\-]/);
+              if (parts.length === 3 && parts[2].length === 4) {
+                let p0 = parseInt(parts[0]),
+                  p1 = parseInt(parts[1]);
+                if (p0 > 12) {
+                  isMMDD = false;
+                  break;
+                }
+                if (p1 > 12) {
+                  isMMDD = true;
+                  break;
+                }
+              }
+            }
+          }
+
+          data.forEach((row) => {
+            let get = (ks) => getGlobal(row, ks);
+            let i = String(get(["id", "code", "رقم الموظف", "رقم"])).trim();
+            if (i.endsWith(".0")) i = i.slice(0, -2);
+            let n = String(get(["name", "اسم", "الموظف", "الاسم"]) || i).trim();
+            let dOrig = get(["date", "يوم", "التاريخ", "تاريخ"]);
+            let tIn = get(["in", "دخول", "حضور", "time in"]);
+            let tOut = get(["out", "خروج", "انصراف", "time out"]);
+            if (!i || !dOrig) return;
+
+            let parseExcelDate = (excelDate) => {
+              if (!excelDate) return "";
+
+              const toYMD = (y, m, d) =>
+                `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+              if (excelDate instanceof Date) {
+                // Use local get methods because SheetJS (with cellDates:true) returns a Date
+                // in the browser's local timezone. Using UTC methods shifts it back by hours,
+                // causing it to fall on the previous day.
+                return toYMD(
+                  excelDate.getFullYear(),
+                  excelDate.getMonth() + 1,
+                  excelDate.getDate(),
+                );
+              }
+              if (typeof excelDate === "number") {
+                // Excel numbers are purely days since 1900-01-01.
+                // Depending on leap year bug, 25569 = 1970-01-01.
+                // We use UTC mathematically here because it's derived from raw milliseconds.
+                let date = new Date(
+                  Math.round((excelDate - 25569) * 86400 * 1000),
+                );
+                return toYMD(
+                  date.getUTCFullYear(),
+                  date.getUTCMonth() + 1,
+                  date.getUTCDate(),
+                );
+              } else if (typeof excelDate === "string") {
+                let parts = excelDate.trim().split(/[\/\-]/);
+                // Try to parse DD/MM/YYYY or MM/DD/YYYY or YYYY-MM-DD
+                if (parts.length === 3) {
+                  let d, m, y;
+                  if (parts[2].length === 4) {
+                    y = parseInt(parts[2]);
+                    let p0 = parseInt(parts[0]),
+                      p1 = parseInt(parts[1]);
+                    // If p0 is obviously year, that wouldn't happen here.
+                    if (p0 > 12) {
+                      d = p0;
+                      m = p1;
+                    } // e.g. 28/12/2025
+                    else if (p1 > 12) {
+                      m = p0;
+                      d = p1;
+                    } // e.g. 12/28/2025
+                    else {
+                      // Apply auto-detected format, or default to DD/MM/YYYY
+                      if (isMMDD) {
+                        m = p0;
+                        d = p1;
+                      } else {
+                        d = p0;
+                        m = p1;
+                      }
+                    }
+                  } else if (parts[0].length === 4) {
+                    // YYYY-MM-DD
+                    y = parseInt(parts[0]);
+                    m = parseInt(parts[1]);
+                    d = parseInt(parts[2]);
+                  }
+                  if (y && m && d) {
+                    return toYMD(y, m, d);
+                  }
+                }
+
+                // Fallback fallback:
+                let dNative = new Date(excelDate);
+                if (!isNaN(dNative.getTime())) {
+                  // Must use local components to avoid UTC shift
+                  return toYMD(
+                    dNative.getFullYear(),
+                    dNative.getMonth() + 1,
+                    dNative.getDate(),
+                  );
+                }
+              }
+              return "";
+            };
+
+            let dStr = parseExcelDate(dOrig);
+            if (!dStr) return;
+
+            let fT = (t) => {
+              if (t === undefined || t === null || t === "") return "";
+              if (typeof t == "number") {
+                let totalMinutes = Math.round(t * 24 * 60);
+                let hours = Math.floor(totalMinutes / 60) % 24;
+                let mins = totalMinutes % 60;
+                return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+              }
+              let s = String(t).trim();
+              let isPM = s.toLowerCase().includes("pm") || s.includes("م");
+              let isAM = s.toLowerCase().includes("am") || s.includes("ص");
+              s = s.replace(/[a-zA-Zم ص]/g, "").trim();
+              let match = s.match(/^(\d{1,2})[.:](\d{1,2})/);
+              if (match) {
+                let h = parseInt(match[1]);
+                let m = parseInt(match[2]);
+                if (isPM && h < 12) h += 12;
+                if (isAM && h === 12) h = 0;
+                return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+              }
+              let fallbackMatch = s.match(/\d{1,2}:\d{2}/);
+              return fallbackMatch ? fallbackMatch[0] : "";
+            };
+            tIn = fT(tIn);
+            tOut = fT(tOut);
+
+            let emp = db.emps.find((x) => x.empId == i);
+            if (!emp) {
+              emp = {
+                id: Math.random().toString(36).substr(2, 9),
+                empId: i,
+                name: n,
+              };
+              db.emps.push(emp);
+            }
+
+            let att = db.atts.find(
+              (a) => a.employeeId == emp.id && a.date == dStr,
+            );
+            if (att) {
+              att.timeIn = tIn || att.timeIn;
+              att.timeOut = tOut || att.timeOut;
+            } else {
+              db.atts.push({
+                id: Math.random().toString(36).substr(2, 9),
+                employeeId: emp.id,
+                date: dStr,
+                timeIn: tIn,
+                timeOut: tOut,
+              });
+            }
+
+            html += `<tr class="hover:bg-gray-50"><td class="p-3 border-b">${emp.empId}</td><td class="p-3 border-b">${emp.name}</td><td class="p-3 border-b text-gray-500">${dStr}</td><td class="p-3 border-b text-green-600">${tIn}</td><td class="p-3 border-b text-red-600">${tOut}</td></tr>`;
+            added++;
+          });
+          saveDB();
+          logsEl.innerHTML += `> نجاح: تم استيراد <b>${added}</b> سجل.`;
+          document
+            .getElementById("import-preview-wrapper")
+            .classList.remove("hidden");
+          prevBody.innerHTML = html;
+          e.target.value = "";
+        };
+        r.readAsArrayBuffer(file);
+      }
+
+      let currEmp = null;
+      function generateReport() {
+        currEmp = document.getElementById("report-emp").value;
+        let sd = document.getElementById("report-start").value;
+        let ed = document.getElementById("report-end").value;
+        if (!currEmp || !sd || !ed) return alert("الرجاء تعبئة بيانات البحث");
+
+        let emp = db.emps.find((e) => e.id == currEmp);
+        document.getElementById("printable-report").classList.remove("hidden");
+        document.getElementById("print-emp-name").innerText = emp.name;
+        document.getElementById("print-emp-id").innerText = emp.empId;
+
+        let monthName = new Date(sd).toLocaleString("ar-SA", {
+          month: "long",
+          year: "numeric",
+        });
+        let pMonthEl = document.getElementById("print-month");
+        if (pMonthEl) pMonthEl.innerText = monthName;
+
+        let periodEl = document.getElementById("print-period");
+        if (periodEl) {
+          let sdFormatted = new Date(sd).toLocaleDateString("en-GB");
+          let edFormatted = new Date(ed).toLocaleDateString("en-GB");
+          periodEl.innerText = `${sdFormatted} - ${edFormatted}`;
+        }
+        
+        let shiftEl = document.getElementById("print-shift");
+        if (shiftEl) shiftEl.innerText = `${db.set.in} - ${db.set.out}`;
+
+        let todayStr = new Date().toLocaleDateString("en-GB");
+        let pDateTop = document.getElementById("print-date-top");
+        if (pDateTop) pDateTop.innerText = todayStr;
+
+        let tbody = "";
+        let pres = 0,
+          absent = 0,
+          otTotal = 0,
+          dedTotal = 0;
+        let cAnnual = 0,
+          cSick = 0,
+          cDisc = 0,
+          cExcuse = 0,
+          cMission = 0;
+
+        const days = [
+          "الأحد",
+          "الاثنين",
+          "الثلاثاء",
+          "الأربعاء",
+          "الخميس",
+          "الجمعة",
+          "السبت",
+        ];
+
+        let currentStrDate = sd;
+        let rowIdx = 1;
+
+        while (currentStrDate <= ed) {
+          let [yearStr, monthStr, dayStr] = currentStrDate.split("-");
+          let dObj = new Date(
+            Date.UTC(yearStr, parseInt(monthStr) - 1, parseInt(dayStr)),
+          );
+          let isWknd = dObj.getUTCDay() === 5 || dObj.getUTCDay() === 6;
+
+          let recs = db.atts.filter(
+            (x) => x.employeeId == currEmp && x.date == currentStrDate,
+          );
+          if (recs.length == 0) recs = [null];
+
+          recs.forEach((rec) => {
+            let rIn = rec?.timeIn || "",
+              rOut = rec?.timeOut || "",
+              rType = rec?.type || "",
+              rNote = rec?.note || "";
+            let wrk = "",
+              early = "";
+            let latM = 0,
+              erlM = 0,
+              dedM = 0,
+              otM = 0;
+
+            if (rec && (rIn || rOut || rType)) {
+              if (!rType) {
+                pres++;
+              } else {
+                if (rType === "إجازة") cAnnual++;
+                if (rType === "مرضي") cSick++;
+                if (rType === "إذن") cExcuse++;
+                if (rType === "مأمورية") cMission++;
+                if (rType === "غياب") {
+                  cDisc++;
+                  absent++;
+                }
+              }
+
+              let minIn = parseT(rIn),
+                minOut = parseT(rOut),
+                minSIn = parseT(db.set.in),
+                minSOut = parseT(db.set.out);
+
+              if (minIn && minOut)
+                wrk = formatT(minOut - minIn > 0 ? minOut - minIn : 0);
+              if (minIn && minSIn && minIn > minSIn) latM = minIn - minSIn;
+              if (minOut && minSOut && minOut < minSOut)
+                erlM = minSOut - minOut;
+              if (minOut && minSOut && minOut > minSOut) otM = minOut - minSOut;
+              dedM = latM + erlM;
+            } else if (rec && rec.type) {
+              // already handled
+            } else if (!isWknd) {
+              absent++;
+            }
+
+            let vL =
+              rec?.vL !== undefined ? rec?.vL : latM ? formatT(latM) : "0:00";
+            let vE =
+              rec?.vE !== undefined ? rec?.vE : erlM ? formatT(erlM) : "0:00";
+            let vD =
+              rec?.vD !== undefined ? rec?.vD : dedM ? formatT(dedM) : "0";
+            let vO =
+              rec?.vO !== undefined ? rec?.vO : otM ? formatT(otM) : "0:00";
+            if (!latM && !rec?.vL) vL = "";
+            if (!erlM && !rec?.vE) vE = "";
+            if (!dedM && !rec?.vD) vD = "";
+            if (!otM && !rec?.vO) vO = "";
+
+            dedTotal += parseT(vD || "0");
+            otTotal += parseT(vO || "0");
+
+            let rId =
+              rec?.id || "new-" + Math.random().toString(36).substr(2, 6);
+            let bgClass = isWknd ? "bg-gray-200" : "bg-white";
+
+            let trDateParts = currentStrDate.split("-");
+            let displayDate = `${trDateParts[1]}/${trDateParts[2]}/${trDateParts[0]}`; // MM/DD/YYYY to match image
+
+            if (isWknd && !rec) {
+              tbody += `
+                <tr class="print:bg-gray-100 bg-gray-50 border-b border-gray-400 print:border hover:bg-blue-50">
+                    <td class="p-1 border border-gray-400 font-bold">${rowIdx}</td>
+                    <td class="p-1 border border-gray-400 font-bold" dir="ltr">${displayDate}</td>
+                    <td class="p-1 border border-gray-400 font-bold">${days[dObj.getUTCDay()]}</td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
+                </tr>
+              `;
+            } else {
+              tbody += `
+                <tr class="${bgClass} border-b border-gray-400 print:border hover:bg-blue-50">
+                    <td class="p-1 border border-gray-400 font-bold">${rowIdx}</td>
+                    <td class="p-1 border border-gray-400 font-bold" dir="ltr">${displayDate}</td>
+                    <td class="p-1 border border-gray-400 font-bold">${days[dObj.getUTCDay()]}</td>
+                    <td class="p-0 border border-gray-400 bg-white min-w-[60px]"><input type="time" value="${rIn}" onchange="updA('${rId}','${currentStrDate}','timeIn',this.value)" class="w-full text-center text-xs p-1 outline-none print:hidden"><span class="hidden print:inline">${rIn}</span></td>
+                    <td class="p-0 border border-gray-400 bg-white min-w-[60px]"><input type="time" value="${rOut}" onchange="updA('${rId}','${currentStrDate}','timeOut',this.value)" class="w-full text-center text-xs p-1 outline-none print:hidden"><span class="hidden print:inline">${rOut}</span></td>
+                    <td class="p-1 border border-gray-400 font-bold bg-white">${wrk || "0:00"}</td>
+                    <td class="p-0 border border-gray-400 shadow-inner bg-white min-w-[50px]"><input type="text" value="${vL}" onchange="updA('${rId}','${currentStrDate}','vL',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden"><span class="hidden print:inline">${vL}</span></td>
+                    <td class="p-0 border border-gray-400 shadow-inner bg-white min-w-[50px]"><input type="text" value="${vE}" onchange="updA('${rId}','${currentStrDate}','vE',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden"><span class="hidden print:inline">${vE}</span></td>
+                    <td class="p-0 border border-gray-400 bg-red-50 text-red-800 font-bold min-w-[50px]"><input type="text" value="${vD}" onchange="updA('${rId}','${currentStrDate}','vD',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vD}</span></td>
+                    <td class="p-0 border border-gray-400 bg-blue-50 text-brand-blue font-bold min-w-[50px]"><input type="text" value="${vO}" onchange="updA('${rId}','${currentStrDate}','vO',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vO}</span></td>
+                    <td class="p-0 border border-gray-400 bg-white"><div class="flex gap-1 p-1 print:flex-col print:p-0">
+                        <select onchange="updA('${rId}','${currentStrDate}','type',this.value)" class="text-[10px] border rounded outline-none p-0.5 print:hidden w-1/2">
+                        <option value="">-</option>
+                        <option value="إجازة" ${rType == "إجازة" ? "selected" : ""}>إجازة</option>
+                        <option value="مرضي" ${rType == "مرضي" ? "selected" : ""}>مرضي</option>
+                        <option value="إذن" ${rType == "إذن" ? "selected" : ""}>إذن</option>
+                        <option value="مأمورية" ${rType == "مأمورية" ? "selected" : ""}>مأمورية</option>
+                        <option value="غياب" ${rType == "غياب" ? "selected" : ""}>غياب</option>
+                        </select>
+                        <input type="text" value="${rNote}" placeholder="ملاحظة" onchange="updA('${rId}','${currentStrDate}','note',this.value)" class="text-[10px] border rounded outline-none p-0.5 print:hidden w-1/2 text-right">
+                        <span class="hidden print:block text-[9px] w-full p-1 text-right leading-tight">${rType} ${rNote ? "- " + rNote : ""}</span>
+                    </div></td>
+                </tr>
+              `;
+            }
+          });
+
+          let nextD = new Date(
+            Date.UTC(yearStr, parseInt(monthStr) - 1, parseInt(dayStr) + 1),
+          );
+          currentStrDate = nextD.toISOString().split("T")[0];
+          rowIdx++;
+        }
+
+        document.getElementById("report-table-body").innerHTML = tbody;
+        document.getElementById("sum-p").innerText = pres;
+        document.getElementById("sum-a").innerText = absent;
+        document.getElementById("sum-d").innerText =
+          formatT(dedTotal) || "0:00";
+        document.getElementById("sum-o").innerText = formatT(otTotal) || "0:00";
+
+        let elAnn = document.getElementById("c-annual");
+        if (elAnn) elAnn.innerText = cAnnual;
+        let elSick = document.getElementById("c-sick");
+        if (elSick) elSick.innerText = cSick;
+        let elDisc = document.getElementById("c-disc");
+        if (elDisc) elDisc.innerText = cDisc;
+        let elExc = document.getElementById("c-excuse");
+        if (elExc) elExc.innerText = cExcuse;
+        let missionEl = document.getElementById("c-mission");
+        if (missionEl) missionEl.innerText = cMission;
+      }
+
+      window.updA = function (id, dStr, fld, val) {
+        let idx = db.atts.findIndex((a) => a.id == id);
+        if (idx >= 0) {
+          if (val === "" && ["vL", "vE", "vD", "vO"].includes(fld))
+            delete db.atts[idx][fld];
+          else db.atts[idx][fld] = val;
+        } else {
+          let n = {
+            id: Math.random().toString(36).substr(2, 9),
+            employeeId: currEmp,
+            date: dStr,
+            timeIn: "",
+            timeOut: "",
+            [fld]: val,
+          };
+          db.atts.push(n);
+        }
+        saveDB();
+        generateReport();
+      };
+
+      window.addManualRecord = function () {
+        let type = document.getElementById("man-type").value;
+        let dStr = document.getElementById("man-date").value;
+        if (!dStr) {
+          alert("يرجى تحديد تاريخ!");
+          return;
+        }
+        db.atts.push({
+          id: Math.random().toString(36).substr(2, 9),
+          employeeId: currEmp,
+          date: dStr,
+          timeIn: document.getElementById("man-in").value,
+          timeOut: document.getElementById("man-out").value,
+          type: type,
+        });
+        saveDB();
+        document.getElementById("man-type").value = "";
+        document.getElementById("man-date").value = "";
+        document.getElementById("man-in").value = "";
+        document.getElementById("man-out").value = "";
+        generateReport();
+      };
+
+      function saveSettings() {
+        db.set.in = document.getElementById("s-start").value;
+        db.set.out = document.getElementById("s-end").value;
+        saveDB();
+        alert("تم الحفظ");
+      }
+
+      function saveManualAtt(e) {
+        e.preventDefault();
+        let empId = document.getElementById("man-att-emp").value;
+        let dStr = document.getElementById("man-att-date").value;
+        let inT = document.getElementById("man-att-in").value;
+        let outT = document.getElementById("man-att-out").value;
+        let typeVal = document.getElementById("man-att-type").value;
+        let noteVal = document.getElementById("man-att-note").value;
+
+        if (!empId || !dStr) return;
+
+        let att = db.atts.find((a) => a.employeeId == empId && a.date == dStr);
+        if (att) {
+          if (inT) att.timeIn = inT;
+          if (outT) att.timeOut = outT;
+          if (typeVal) att.type = typeVal;
+          if (noteVal) att.note = noteVal;
+        } else {
+          db.atts.push({
+            id: Math.random().toString(36).substr(2, 9),
+            employeeId: empId,
+            date: dStr,
+            timeIn: inT,
+            timeOut: outT,
+            type: typeVal,
+            note: noteVal,
+          });
+        }
+        saveDB();
+        alert("تم حفظ بيانات الدخول/الخروج بنجاح!");
+        document.getElementById("man-att-in").value = "";
+        document.getElementById("man-att-out").value = "";
+        document.getElementById("man-att-type").value = "";
+        document.getElementById("man-att-note").value = "";
+      }
+
+      function exportDB() {
+        let dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(db));
+        let a = document.createElement("a");
+        a.href = dataStr;
+        a.download = "hr_backup_data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      function importDB(e) {
+        let file = e.target.files[0];
+        if (!file) return;
+        let r = new FileReader();
+        r.onload = (evt) => {
+          try {
+            let data = JSON.parse(evt.target.result);
+            if (data.emps && data.atts) {
+              db = data;
+              saveDB();
+              alert("تم استعادة البيانات بنجاح!");
+              location.reload();
+            } else {
+              alert("ملف الاستعادة غير صالح.");
+            }
+          } catch (err) {
+            alert("خطأ في قراءة الملف.");
+          }
+        };
+        r.readAsText(file);
+      }
+
+      function downloadSelf() {
+        let dom = document.documentElement.outerHTML.replace(
+          /<script id="data-inject">.*?<\/script>/s,
+          "",
+        );
+        let payload = `<script id="data-inject">if(!localStorage.getItem('hr_e')) { localStorage.setItem('hr_e', \`${JSON.stringify(db.emps)}\`); localStorage.setItem('hr_a', \`${JSON.stringify(db.atts)}\`); localStorage.setItem('hr_s', \`${JSON.stringify(db.set)}\`); } <\/script>`;
+        let html =
+          '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n' +
+          dom.replace("</body>", payload + "\n</body>") +
+          "\n</html>";
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+        a.download = "Omar_Attendance.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        let d = new Date();
+        document.getElementById("report-start").value = new Date(
+          d.getFullYear(),
+          d.getMonth(),
+          2,
+        )
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("report-end").value = new Date(
+          d.getFullYear(),
+          d.getMonth() + 1,
+          1,
+        )
+          .toISOString()
+          .split("T")[0];
+        saveDB();
+        navigate("dashboard");
+      });
+    </script>
+  </body>
+</html>

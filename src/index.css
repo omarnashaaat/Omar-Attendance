@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #0f172a;
+  --color-brand-sidebar-hover: #1e293b;
+  --color-brand-red: #ef4444;
+  --color-brand-green: #10b981;
+  --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .dir-ltr {
+    direction: ltr;
+  }
+  .dir-rtl {
+    direction: rtl;
+  }
+  .font-arabic {
+    font-family: "Cairo", ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900;
+  }
+}
+
+@media print {
+  @page {
+    margin: 5mm;
+    size: A4 portrait;
+  }
+  body, #root {
+    background-color: white !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  #report-container, #printable-report, .report-content {
+    transform: scale(0.93);
+    transform-origin: top center;
+  }
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Hide scrollbars and extra padding */
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .print-no-break {
+    page-break-inside: avoid;
+  }
+  /* Table specific adjustments for A4 */
+  table {
+    width: 100% !important;
+    table-layout: fixed;
+    border-collapse: collapse !important;
+    margin-bottom: 5mm !important;
+  }
+  th, td {
+    word-wrap: break-word;
+    font-size: 8pt !important;
+    padding: 1px !important;
+    line-height: 1.1 !important;
+  }
+  tr {
+    height: auto !important;
+  }
+  .print-mb-small {
+    margin-bottom: 2mm !important;
+  }
+  .print-p-small {
+    padding: 1mm !important;
+  }
+  h1 { font-size: 14pt !important; }
+}
+
