@@ -171,19 +171,31 @@ export default function ImportView() {
       const inTime = cleanTime(timeInStr);
       const outTime = cleanTime(timeOutStr);
 
+      // If both missing, we usually skip, BUT if we have a record at all, maybe we should default?
+      // Let's check if the row has some indication of presence even without times
+      const isPresentIndicated = String(findValue(['status', 'الحالة', 'الحضور'])).includes('ح'); // 'حضور' or 'حاضر'
+      
+      let finalIn = inTime;
+      let finalOut = outTime;
+
       if (!inTime && !outTime) {
-        if (skipped < 3) {
-          setLogs(prev => [...prev, `تخطي السطر ${index + 2}: لا يوجد وقت دخول أو خروج.`]);
+        if (isPresentIndicated) {
+          finalIn = emp.shiftStart || settings.defaultShiftStart;
+          finalOut = emp.shiftEnd || settings.defaultShiftEnd;
+        } else {
+          if (skipped < 3) {
+            setLogs(prev => [...prev, `تخطي السطر ${index + 2}: لا يوجد وقت دخول أو خروج.`]);
+          }
+          skipped++;
+          return;
         }
-        skipped++;
-        return;
       }
 
       const existingIdx = currentAttendance.findIndex(a => a.employeeId === emp!.id && a.date === formattedDate);
       if (existingIdx >= 0) {
         // Update
-        currentAttendance[existingIdx].timeIn = inTime || currentAttendance[existingIdx].timeIn;
-        currentAttendance[existingIdx].timeOut = outTime || currentAttendance[existingIdx].timeOut;
+        currentAttendance[existingIdx].timeIn = finalIn || currentAttendance[existingIdx].timeIn;
+        currentAttendance[existingIdx].timeOut = finalOut || currentAttendance[existingIdx].timeOut;
         currentAttendance[existingIdx].isAbsent = false;
       } else {
         // Add
@@ -191,8 +203,8 @@ export default function ImportView() {
           id: generateId(),
           employeeId: emp!.id,
           date: formattedDate,
-          timeIn: inTime,
-          timeOut: outTime,
+          timeIn: finalIn,
+          timeOut: finalOut,
           notes: 'مستورد من إكسيل',
           isAbsent: false 
         });
@@ -202,8 +214,8 @@ export default function ImportView() {
         empId: emp!.empId,
         name: emp!.name,
         date: formattedDate,
-        in: inTime,
-        out: outTime
+        in: finalIn,
+        out: finalOut
       });
       
       added++;

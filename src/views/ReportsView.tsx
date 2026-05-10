@@ -162,12 +162,11 @@ export default function ReportsView() {
           earlyMins: 0,
           dedMins: 0,
           otMins: 0,
-          status: record?.recordType || (isWeekend && !record ? 'عطلة' : 'غياب'),
+          status: record?.recordType ? record.recordType : (record ? 'حضور' : (isWeekend && !record ? 'عطلة' : 'غياب')),
           rowClass: isWeekend && !record ? 'bg-gray-100 print:bg-gray-100' : ''
         };
 
-        if (record && !record.isAbsent && (record.timeIn || record.timeOut || record.recordType)) {
-          if (!record.recordType) row.status = 'حضور';
+        if (record && !record.isAbsent) {
           row.rowClass = '';
 
           if (record.timeIn && record.timeOut) {
@@ -202,9 +201,89 @@ export default function ReportsView() {
         dailyRecords.forEach((rec, idx) => addRow(rec, idx));
       }
     }
-    
     return report;
   };
+
+  const handleBulkAdd = () => {
+    if (!currentEmp || !startDateStr || !endDateStr || !settings) return;
+    
+    let addedCount = 0;
+    
+    const startD = parse(startDateStr, 'yyyy-MM-dd', new Date());
+    const endD = parse(endDateStr, 'yyyy-MM-dd', new Date());
+    const daysCount = differenceInDays(endD, startD) + 1;
+    
+    let current = [...attendance];
+    
+    for (let i = 0; i < daysCount; i++) {
+      const currentDate = new Date(startD.getFullYear(), startD.getMonth(), startD.getDate() + i);
+      const dateStr = format(currentDate, 'yyyy-MM-dd');
+      const dayOfWeek = getDay(currentDate);
+      const isWeekend = settings.weekendDays.includes(dayOfWeek);
+      
+      if (!isWeekend) {
+        const existing = current.find(a => a.employeeId === currentEmp.id && a.date === dateStr);
+        if (!existing) {
+          current.push({
+            id: generateId(),
+            employeeId: currentEmp.id,
+            date: dateStr,
+            timeIn: currentEmp.shiftStart || settings.defaultShiftStart,
+            timeOut: currentEmp.shiftEnd || settings.defaultShiftEnd,
+            notes: 'إضافة جماعية',
+            isAbsent: false
+          });
+          addedCount++;
+        }
+      }
+    }
+    
+    setAttendance(current);
+    saveAttendance(current);
+    alert(`تم إضافة ${addedCount} سجل حضور للموظف.`);
+  };
+
+  const handleBulkAddAllEmployees = () => {
+    if (!startDateStr || !endDateStr || !settings) return;
+    
+    const startD = parse(startDateStr, 'yyyy-MM-dd', new Date());
+    const endD = parse(endDateStr, 'yyyy-MM-dd', new Date());
+    const daysCount = differenceInDays(endD, startD) + 1;
+    
+    let current = [...attendance];
+    let totalAdded = 0;
+
+    employees.forEach(emp => {
+      for (let i = 0; i < daysCount; i++) {
+        const currentDate = new Date(startD.getFullYear(), startD.getMonth(), startD.getDate() + i);
+        const dateStr = format(currentDate, 'yyyy-MM-dd');
+        const dayOfWeek = getDay(currentDate);
+        const isWeekend = settings.weekendDays.includes(dayOfWeek);
+        
+        if (!isWeekend) {
+          const existing = current.find(a => a.employeeId === emp.id && a.date === dateStr);
+          if (!existing) {
+            current.push({
+              id: generateId(),
+              employeeId: emp.id,
+              date: dateStr,
+              timeIn: emp.shiftStart || settings.defaultShiftStart,
+              timeOut: emp.shiftEnd || settings.defaultShiftEnd,
+              notes: 'إضافة جماعية للمنظمة',
+              isAbsent: false
+            });
+            totalAdded++;
+          }
+        }
+      }
+    });
+
+    setAttendance(current);
+    saveAttendance(current);
+    alert(`تم إضافة ${totalAdded} سجل حضور لجميع الموظفين.`);
+  };
+
+  if (!settings) return null;
 
   const reportData = generateReportData();
 
@@ -262,9 +341,26 @@ export default function ReportsView() {
         <button 
           onClick={handlePrint}
           disabled={!currentEmp}
-          className="bg-brand-blue text-white px-6 py-2 rounded-lg hover:bg-blue-900 disabled:opacity-50 ms-auto flex gap-2 items-center"
+          className="bg-brand-blue text-white px-6 py-2 rounded-lg hover:bg-blue-900 disabled:opacity-50 flex gap-2 items-center"
         >
           طباعة التقرير
+        </button>
+
+        <button 
+          onClick={handleBulkAdd}
+          disabled={!currentEmp}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 flex gap-2 items-center text-sm"
+          title="إضافة حضور لجميع أيام العمل في الفترة المختارة لهذا الموظف"
+        >
+          حضور جماعي للموظف
+        </button>
+
+        <button 
+          onClick={handleBulkAddAllEmployees}
+          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex gap-2 items-center text-sm"
+          title="إضافة حضور لجميع الموظفين لجميع أيام العمل في الفترة المختارة"
+        >
+          حضور جماعي للكل
         </button>
       </div>
 
