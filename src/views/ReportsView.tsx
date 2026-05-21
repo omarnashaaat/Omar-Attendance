@@ -3,6 +3,7 @@ import { format, getDay, differenceInDays, parse, isSameMonth } from 'date-fns';
 import { arSA } from 'date-fns/locale/ar-SA';
 import { Employee, getEmployees, getAttendance, saveAttendance, getSettings, AppSettings, AttendanceRecord } from '../store';
 import { calculateHours, generateId } from '../utils';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 export default function ReportsView() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -115,7 +116,7 @@ export default function ReportsView() {
   };
 
   const generateReportData = () => {
-    if (!currentEmp || !startDateStr || !endDateStr) return [];
+    if (!currentEmp || !startDateStr || !endDateStr || !settings) return [];
 
     let startD = parse(startDateStr, 'yyyy-MM-dd', new Date());
     let endD = parse(endDateStr, 'yyyy-MM-dd', new Date());
@@ -126,6 +127,7 @@ export default function ReportsView() {
 
     const daysCount = differenceInDays(endD, startD) + 1;
     const report: any[] = [];
+    const ruleOccurrences: Record<string, number> = {};
 
     const empShiftStart = currentEmp.shiftStart || settings.defaultShiftStart;
     const empShiftEnd = currentEmp.shiftEnd || settings.defaultShiftEnd;
@@ -163,7 +165,12 @@ export default function ReportsView() {
           dedMins: 0,
           otMins: 0,
           status: record?.recordType ? record.recordType : (record ? 'حضور' : (isWeekend && !record ? 'عطلة' : 'غياب')),
-          rowClass: isWeekend && !record ? 'bg-gray-100 print:bg-gray-100' : ''
+          rowClass: isWeekend && !record ? 'bg-gray-100 print:bg-gray-100' : '',
+          penaltyText: '',
+          penaltyValue: 0,
+          penaltyType: 'warning',
+          matchedRuleName: '',
+          occurrenceIndex: 0
         };
 
         if (record && !record.isAbsent) {
@@ -191,6 +198,62 @@ export default function ReportsView() {
         row.earlyStr = record?.manualEarly !== undefined ? record.manualEarly : (row.total ? formatMins(row.earlyMins) : '');
         row.dedStr = record?.manualDed !== undefined ? record.manualDed : (row.total ? formatMins(row.dedMins) : '');
         row.otStr = record?.manualOT !== undefined ? record.manualOT : (row.total ? formatMins(row.otMins) : '');
+
+        // Lateness Policy Rules Calculations
+        let currentLateMins = row.lateMins;
+        if (record && record.manualLate !== undefined && record.manualLate !== null && record.manualLate !== '') {
+          const parts = record.manualLate.trim().split(':');
+          if (parts.length === 2) {
+            currentLateMins = parseInt(parts[0] || '0', 10) * 60 + parseInt(parts[1] || '0', 10);
+          }
+        }
+
+        const isNotWorkingDay = record && (record.isAbsent || record.recordType === 'Annual' || record.recordType === 'Sick' || record.recordType === 'Discounted' || record.recordType === 'غياب' || record.recordType === 'إجازة');
+
+        let penaltyText = '';
+        let penaltyValue = 0;
+        let penaltyType: 'hours' | 'days' | 'warning' = 'warning';
+        let matchedRuleName = '';
+        let occurrenceIndex = 0;
+
+        if (settings.enableLatenessPolicy && currentLateMins > 0 && !isNotWorkingDay) {
+          const rules = settings.latenessRules || [];
+          const matchedRule = rules.find(r => currentLateMins >= r.minMins && currentLateMins <= r.maxMins);
+
+          if (matchedRule) {
+            ruleOccurrences[matchedRule.id] = (ruleOccurrences[matchedRule.id] || 0) + 1;
+            occurrenceIndex = ruleOccurrences[matchedRule.id];
+            matchedRuleName = matchedRule.name;
+
+            if (occurrenceIndex === 1) {
+              penaltyValue = matchedRule.p1Value;
+              penaltyType = matchedRule.p1Type;
+            } else if (occurrenceIndex === 2) {
+              penaltyValue = matchedRule.p2Value;
+              penaltyType = matchedRule.p2Type;
+            } else if (occurrenceIndex === 3) {
+              penaltyValue = matchedRule.p3Value;
+              penaltyType = matchedRule.p3Type;
+            } else {
+              penaltyValue = matchedRule.p4Value;
+              penaltyType = matchedRule.p4Type;
+            }
+
+            if (penaltyType === 'warning') {
+              penaltyText = 'إنذار كتابي';
+            } else if (penaltyType === 'days') {
+              penaltyText = `خصم يومي (${penaltyValue} يوم)`;
+            } else if (penaltyType === 'hours') {
+              penaltyText = `خصم ساعاتي (${penaltyValue} ساعة)`;
+            }
+          }
+        }
+
+        row.penaltyText = penaltyText;
+        row.penaltyValue = penaltyValue;
+        row.penaltyType = penaltyType;
+        row.matchedRuleName = matchedRuleName;
+        row.occurrenceIndex = occurrenceIndex;
 
         report.push(row);
       };
@@ -287,6 +350,48 @@ export default function ReportsView() {
 
   const reportData = generateReportData();
 
+  const parseFloatHours = (timeStr: string) => {
+    if (!timeStr || timeStr === '0:00') return 0;
+    const parts = timeStr.trim().split(':');
+    if (parts.length === 2) {
+      const h = parseInt(parts[0] || '0', 10);
+      const m = parseInt(parts[1] || '0', 10);
+      return Number((h + m / 60).toFixed(2));
+    }
+    return 0;
+  };
+
+  const chartData = reportData.map((row, index) => {
+    let dayNum = '';
+    try {
+      dayNum = format(new Date(row.date), 'dd');
+    } catch {
+      dayNum = row.date;
+    }
+
+    const pastRows = reportData.slice(0, index + 1);
+    const activeDays = pastRows.filter(r => r.status !== 'عطلة');
+    const presentDays = activeDays.filter(
+      r => r.status === 'حضور' || 
+           r.recordType === 'Annual' || 
+           r.recordType === 'Sick' || 
+           r.recordType === 'Excuse' || 
+           r.recordType === 'Mission'
+    );
+    
+    const cumulativeRate = activeDays.length > 0 
+      ? Math.round((presentDays.length / activeDays.length) * 100) 
+      : 100;
+
+    const workHours = parseFloatHours(row.total);
+
+    return {
+      day: dayNum,
+      'نسبة الحضور (%)': cumulativeRate,
+      'ساعات العمل': workHours,
+    };
+  });
+
   const summary = reportData.reduce((acc, curr) => {
     if (curr.status === 'حضور') acc.present++;
     if (curr.status === 'غياب') acc.absent++;
@@ -300,9 +405,34 @@ export default function ReportsView() {
     acc.totalEarly += parseMins(curr.earlyStr);
     acc.totalOT += parseMins(curr.otStr);
     acc.totalDeduction += parseMins(curr.dedStr);
+
+    if (settings && settings.enableLatenessPolicy && curr.penaltyType) {
+      if (curr.penaltyType === 'warning' && curr.penaltyText) {
+        acc.totalWarnings++;
+      } else if (curr.penaltyType === 'days') {
+        acc.totalDaysDeducted += curr.penaltyValue || 0;
+      } else if (curr.penaltyType === 'hours') {
+        acc.totalHoursDeducted += curr.penaltyValue || 0;
+      }
+    }
     
     return acc;
-  }, { present: 0, absent: 0, totalLate: 0, totalEarly: 0, totalOT: 0, totalDeduction: 0, annual: 0, sick: 0, discounted: 0, excuse: 0, mission: 0 });
+  }, { 
+    present: 0, 
+    absent: 0, 
+    totalLate: 0, 
+    totalEarly: 0, 
+    totalOT: 0, 
+    totalDeduction: 0, 
+    annual: 0, 
+    sick: 0, 
+    discounted: 0, 
+    excuse: 0, 
+    mission: 0,
+    totalWarnings: 0,
+    totalDaysDeducted: 0,
+    totalHoursDeducted: 0
+  });
 
   return (
     <div className="space-y-6">
@@ -386,6 +516,66 @@ export default function ReportsView() {
             </div>
           </div>
 
+          {/* Recharts Attendance Trend Line Chart */}
+          <div className="mb-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl print:hidden">
+            <h3 className="text-xs font-extrabold text-slate-800 mb-3 flex items-center gap-1.5 justify-start">
+              <span>📈</span>
+              <span>منحنى تطور نسبة الحضور اليومية وساعات العمل للموظف خلال الشهر</span>
+            </h3>
+            <div className="w-full h-64 font-sans text-[11px]" dir="ltr">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="day" 
+                    stroke="#64748b" 
+                    tickLine={false}
+                    label={{ value: 'اليوم بالشهر', position: 'insideBottom', offset: -5, fill: '#64748b', fontSize: 10 }}
+                  />
+                  <YAxis 
+                    yAxisId="left" 
+                    stroke="#3b82f6" 
+                    domain={[0, 100]}
+                    tickLine={false}
+                    label={{ value: 'نسبة الحضور (%)', angle: -90, position: 'insideLeft', fill: '#3b82f6', offset: 10 }}
+                  />
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right" 
+                    stroke="#10b981" 
+                    domain={[0, 'auto']}
+                    tickLine={false}
+                    label={{ value: 'ساعات العمل', angle: 90, position: 'insideRight', fill: '#10b981', offset: 10 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', textAlign: 'right', direction: 'rtl' }}
+                  />
+                  <Legend verticalAlign="top" height={36} />
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="نسبة الحضور (%)" 
+                    stroke="#2563eb" 
+                    strokeWidth={2.5}
+                    activeDot={{ r: 6 }} 
+                    dot={{ r: 3 }}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="ساعات العمل" 
+                    stroke="#10b981" 
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
           <div className="overflow-x-auto print:overflow-visible">
             <table className="w-full text-[10px] text-center border-collapse border border-gray-400 mb-2 min-w-[1000px] print:min-w-full print:text-[8pt]">
               <thead className="bg-gray-100 font-bold border-b-2 border-gray-400">
@@ -399,6 +589,12 @@ export default function ReportsView() {
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">خروج</th>
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">العمل</th>
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">تأخير</th>
+                  {settings?.enableLatenessPolicy && (
+                    <>
+                      <th className="border border-gray-400 p-1 w-20 print:p-0.5 bg-rose-50 text-rose-900 font-extrabold text-[9px]">بند لائحة التأخير</th>
+                      <th className="border border-gray-400 p-1 w-20 print:p-0.5 bg-rose-50 text-rose-900 font-extrabold text-[9px]">الجزاء المطبق</th>
+                    </>
+                  )}
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">مبكر</th>
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">خصم</th>
                   <th className="border border-gray-400 p-1 w-14 print:p-0.5">إضافي</th>
@@ -440,6 +636,33 @@ export default function ReportsView() {
                         className="w-full text-center bg-transparent border-none focus:ring-1 focus:ring-brand-blue outline-none rounded print:hidden text-xs font-mono" />
                       <span className="hidden print:inline">{row.lateStr}</span>
                     </td>
+                    {settings?.enableLatenessPolicy && (
+                      <>
+                        <td className="border border-gray-400 p-1 bg-rose-50 text-rose-900 text-center font-medium">
+                          {row.matchedRuleName ? (
+                            <span className="px-1.5 py-0.5 rounded-full bg-rose-100 text-[9px] font-bold">
+                              {row.matchedRuleName}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="border border-gray-400 p-1 bg-rose-50/70 text-center">
+                          {row.penaltyText ? (
+                            <div className="flex flex-col items-center justify-center gap-0.5">
+                              <span className="text-red-700 font-extrabold text-[9px]">
+                                {row.penaltyText}
+                              </span>
+                              <span className="text-[8px] text-red-500 font-mono leading-none">
+                                (التكرار: #{row.occurrenceIndex})
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                      </>
+                    )}
                     <td className="border border-gray-400 p-[2px]">
                       <input type="text" value={row.earlyStr}
                         onChange={(e) => updateRecord(row.id, row.date, 'manualEarly', e.target.value)}
@@ -502,7 +725,7 @@ export default function ReportsView() {
                   <td className="p-1 text-center text-gray-400">-</td>
                   <td className="p-1"><input type="time" value={newEntryIn} onChange={e=>setNewEntryIn(e.target.value)} className="w-full text-xs p-1 rounded border border-gray-300 text-center" /></td>
                   <td className="p-1"><input type="time" value={newEntryOut} onChange={e=>setNewEntryOut(e.target.value)} className="w-full text-xs p-1 rounded border border-gray-300 text-center" /></td>
-                  <td colSpan={5}></td>
+                  <td colSpan={settings?.enableLatenessPolicy ? 7 : 5}></td>
                   <td className="p-1 flex gap-1">
                     <select value={newEntryType} onChange={e => setNewEntryType(e.target.value)} className="w-1/3 text-xs p-1 rounded border border-gray-300 dir-rtl font-arabic">
                       <option value="">نوع السجل</option>
@@ -586,6 +809,43 @@ export default function ReportsView() {
               </table>
             </div>
           </div>
+
+          {settings?.enableLatenessPolicy && (
+            <div className="mt-4 p-4 bg-rose-50 border border-rose-100 rounded-xl font-sans text-right dir-rtl print:bg-white print:border-gray-300">
+              <h4 className="text-xs font-extrabold text-rose-950 mb-2 flex items-center gap-1.5 justify-start">
+                <span>📑</span>
+                <span>ملخص لائحة الجزاءات والخصومات الأوتوماتيكية للتأخير:</span>
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-right">
+                <div className="p-2.5 bg-white rounded-lg border border-rose-100/60 print:border-gray-300">
+                  <p className="text-[9px] text-rose-800 font-extrabold mb-0.5">عدد الإنذارات الصادرة</p>
+                  <p className="text-sm font-bold text-rose-950">{summary.totalWarnings || 0} إنذار خطي</p>
+                </div>
+                <div className="p-2.5 bg-white rounded-lg border border-rose-100/60 print:border-gray-300">
+                  <p className="text-[9px] text-rose-800 font-extrabold mb-0.5">إجمالي خصومات الأيام</p>
+                  <p className="text-sm font-bold text-rose-950">{summary.totalDaysDeducted || 0} يوم خصم</p>
+                </div>
+                <div className="p-2.5 bg-white rounded-lg border border-rose-100/60 print:border-gray-300">
+                  <p className="text-[9px] text-rose-800 font-extrabold mb-0.5">إجمالي خصومات الساعات</p>
+                  <p className="text-sm font-bold text-rose-950">{summary.totalHoursDeducted || 0} ساعة خصم</p>
+                </div>
+                <div className="p-2.5 bg-rose-950 text-white rounded-lg border border-rose-900 print:border-gray-300 print:bg-white print:text-black">
+                  <p className="text-[9px] text-rose-200 font-extrabold mb-0.5 print:text-gray-500">القيمة النقدية للجزاءات</p>
+                  <p className="text-sm font-bold text-rose-100 font-mono print:text-black">
+                    {(() => {
+                      const dailyRate = currentEmp?.salary ? (currentEmp.salary / 30) : 0;
+                      const hourlyRate = currentEmp?.salary ? (currentEmp.salary / (30 * 8)) : 0;
+                      const totalCashPen = (summary.totalDaysDeducted * dailyRate) + (summary.totalHoursDeducted * hourlyRate);
+                      return totalCashPen > 0 ? `${totalCashPen.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س` : 'لا يوجد خصم مالي';
+                    })()}
+                  </p>
+                  {currentEmp?.salary && currentEmp.salary > 0 && (
+                    <p className="text-[8px] text-rose-300 mt-0.5 leading-none print:text-gray-500">(بناءً على الراتب الأساسي: {currentEmp.salary} ر.س)</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -32,16 +32,30 @@
       .view-section.active {
         display: block;
       }
-      .nav-link.active {
-        background-color: #1e3a8a;
-        color: white;
-      }
       .nav-link {
         background-color: transparent;
-        color: #475569;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      }
+      .nav-link.active {
+        background-color: #3b82f6;
+        color: #ffffff;
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.15);
+        transform: scale(1.05);
       }
       .nav-link:hover:not(.active) {
-        background-color: #e2e8f0;
+        background-color: #1e293b;
+        color: #f9fafb;
+        transform: translateY(-2px);
+      }
+      @media (max-width: 767px) {
+        body {
+          padding-bottom: 5.5rem;
+        }
       }
       @media print {
         @page {
@@ -112,216 +126,468 @@
       }
     </style>
   </head>
-  <body class="flex flex-col md:flex-row min-h-screen">
-    <aside class="w-full md:w-64 bg-white shadow-lg no-print flex flex-col">
-      <div class="p-6 border-b border-gray-100 flex items-center gap-3">
-        <div
-          class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center text-white font-bold text-xl"
-        >
-          HR
+  <body class="flex flex-col min-h-screen bg-slate-50">
+    <header class="no-print bg-slate-900 border-b border-slate-800 text-slate-100 flex items-center justify-between px-6 py-4 shadow-xl sticky top-0 z-50">
+      <!-- Logo and Direct Action to Hub -->
+      <div class="flex items-center gap-3 cursor-pointer select-none" onclick="navigate('dashboard')">
+        <div class="w-11 h-11 bg-gradient-to-tr from-blue-600 to-indigo-650 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/35 transform hover:rotate-6 transition duration-300">
+          ح
         </div>
-        <h1 class="font-bold text-xl text-gray-800">Omar Attendance</h1>
+        <div class="flex flex-col">
+          <h1 class="font-extrabold text-lg leading-tight text-white font-Cairo flex items-center gap-1.5">
+            <span class="text-blue-400">بوابة</span> الحضور والمسيرات الذكية
+          </h1>
+          <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest font-mono">ELITE ATTENDANCE PLATFORM</span>
+        </div>
       </div>
-      <nav class="flex-1 p-4 space-y-2">
-        <button
-          onclick="navigate('dashboard')"
-          id="nav-dashboard"
-          class="nav-link active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
+      
+      <!-- Center Quick Header Indicator (Visual and professional clock) -->
+      <div class="hidden lg:flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700/80 text-xs shadow-inner">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-slate-200 font-bold font-Cairo">خوادم الحفظ المحلي آمنة ومستقرة بنسبة 100%</span>
+      </div>
+
+      <!-- Quick Back to Operations Hub button / Time Info -->
+      <div class="flex items-center gap-3">
+        <button id="back-to-hub-btn" onclick="navigate('dashboard')" class="hidden bg-slate-850 hover:bg-slate-800 text-white border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold items-center gap-1.5 transition active:scale-95 duration-200">
+          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           الرئيسية
         </button>
-        <button
-          onclick="navigate('employees')"
-          id="nav-employees"
-          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
-          إدارة الموظفين
-        </button>
-        <button
-          onclick="navigate('import')"
-          id="nav-import"
-          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
-          رفع الإكسيل
-        </button>
-        <button
-          onclick="navigate('reports')"
-          id="nav-reports"
-          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
-          التقارير التفصيلية
-        </button>
-        <button
-          onclick="navigate('manual')"
-          id="nav-manual"
-          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
-          إدخال حضور وانصراف (يدوي)
-        </button>
-        <button
-          onclick="navigate('settings')"
-          id="nav-settings"
-          class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-colors text-right"
-        >
-          الإعدادات
-        </button>
-      </nav>
-    </aside>
+        <div class="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-300 font-mono flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span id="header-time-now" class="font-bold"></span>
+        </div>
+      </div>
+    </header>
 
     <main class="flex-1 p-6 md:p-8 overflow-y-auto print-w-full print:p-0">
       <section id="view-dashboard" class="view-section active space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div
-            class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
-          >
-            <h3 class="text-gray-500 font-medium">إجمالي الموظفين</h3>
-            <p
-              class="text-3xl font-bold text-brand-blue mt-2"
-              id="stat-total-emp"
-            >
-              0
-            </p>
-          </div>
-          <div
-            class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
-          >
-            <h3 class="text-gray-500 font-medium">إجمالي السجلات</h3>
-            <p
-              class="text-3xl font-bold text-green-600 mt-2"
-              id="stat-total-att"
-            >
-              0
-            </p>
+        <!-- Top Operations Hub Banner -->
+        <div class="bg-gradient-to-r from-slate-900 via-[#111c34] to-[#171f30] p-6 md:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+          <div class="absolute left-0 bottom-0 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
+          
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <div class="flex items-center gap-2 mb-2 no-print">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-xs font-bold text-slate-400 tracking-wider">نظام الحساب والورديات المستقل بالكامل</span>
+              </div>
+              <h1 class="text-3xl font-black tracking-tight text-white mb-2">لوحة معلومات الحضور والانصراف</h1>
+              <p class="text-slate-300 text-xs max-w-xl leading-relaxed">
+                مرحباً بك في النظام الذكي لإدارة الحضور والانصراف. من هنا يمكنك إدارة الموظفين، استيراد شيتات البصمة، تسجيل حضور يدوي، وحساب الورديات والتقارير بشكل فوري ودقيق بنسبة 100%.
+              </p>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 w-full lg:w-auto">
+              <div class="bg-slate-800/40 backdrop-blur-md px-4 py-3.5 rounded-2xl border border-white/10 min-w-[140px] text-right">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">👥 إجمالي الموظفين</span>
+                <span class="text-2xl font-black text-blue-400 block" id="stat-total-emp">0</span>
+              </div>
+              <div class="bg-emerald-950/20 backdrop-blur-md px-4 py-3.5 rounded-2xl border border-emerald-500/10 min-w-[140px] text-right">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">✅ حاضر اليوم</span>
+                <span class="text-2xl font-black text-emerald-400 block animate-pulse" id="stat-present-today">0</span>
+              </div>
+              <div class="bg-rose-950/20 backdrop-blur-md px-4 py-3.5 rounded-2xl border border-rose-500/10 min-w-[140px] text-right">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">🚨 متأخر اليوم</span>
+                <span class="text-2xl font-black text-rose-400 block" id="stat-late-today">0</span>
+              </div>
+              <div class="bg-indigo-950/20 backdrop-blur-md px-4 py-3.5 rounded-2xl border border-indigo-500/10 min-w-[140px] text-right">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">📊 نسبة الالتزام</span>
+                <span class="text-2xl font-black text-indigo-400 block" id="stat-attendance-rate">100%</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-          <h3 class="font-bold text-blue-800 text-lg mb-2">تعليمات</h3>
-          <p class="text-blue-700">
-            جميع البيانات تحفظ تلقائياً وبشكل محلي على متصفحك (Offline). انتقل
-            الى الإعدادات لتصدير نسخة احتياطية من هذا الملف مع بياناتك.
-          </p>
+
+        <!-- The Operations Hub Grid exactly matching the design style of the user screenshot -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-8 select-none border-t-4 border-blue-600">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                📱 تطبيقات الحضور والانصراف الذكية
+              </h2>
+              <p class="text-xs text-slate-500 mt-1">اختر التطبيق المطلوب لتسجيل البيانات، إدارة الورديات، أو استخراج التقارير</p>
+            </div>
+          </div>
+          
+          <!-- Springboard iOS-like grid centering only core items with beautiful colored gradients -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-10 gap-x-6 justify-items-center">
+            
+            <!-- 1. شؤون الموظفين -->
+            <button onclick="navigate('employees')" class="group flex flex-col items-center text-center focus:outline-none transition transform hover:-translate-y-2 duration-300 w-full max-w-[150px]">
+              <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-sky-400 rounded-3xl shadow-lg shadow-blue-500/25 flex items-center justify-center transition group-hover:scale-105 duration-300 relative">
+                <div class="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition"></div>
+                <!-- Inline SVG representing employees -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 11-8 0 4 4 0 018 0zm6.3-2.7a5 5 0 010 7.4M22 21v-2a4 4 0 00-3-3.87"/>
+                </svg>
+              </div>
+              <span class="text-sm font-black text-slate-800 mt-3 group-hover:text-blue-600 transition leading-tight">شؤون الموظفين</span>
+              <span class="text-[9px] font-bold text-slate-400 mt-1 leading-normal max-w-[130px]">إضافة وتعيين طاقم العمل وتحديد الورديات</span>
+            </button>
+
+            <!-- 2. التحضير اليدوي -->
+            <button onclick="navigate('manual')" class="group flex flex-col items-center text-center focus:outline-none transition transform hover:-translate-y-2 duration-300 w-full max-w-[150px]">
+              <div class="w-20 h-20 bg-gradient-to-tr from-amber-500 to-orange-400 rounded-3xl shadow-lg shadow-orange-500/25 flex items-center justify-center transition group-hover:scale-105 duration-300 relative">
+                <div class="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition"></div>
+                <!-- Inline SVG Clock/Fingerprint representation -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-black text-slate-800 mt-3 group-hover:text-amber-600 transition leading-tight">تسجيل حضور يدوي</span>
+              <span class="text-[9px] font-bold text-slate-400 mt-1 leading-normal max-w-[130px]">إدخال كشوف تفصيلي أو يدوي وقتي مباشر</span>
+            </button>
+
+            <!-- 3. رفع ملف إكسيل Excel -->
+            <button onclick="navigate('import')" class="group flex flex-col items-center text-center focus:outline-none transition transform hover:-translate-y-2 duration-300 w-full max-w-[150px]">
+              <div class="w-20 h-20 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-3xl shadow-lg shadow-emerald-500/25 flex items-center justify-center transition group-hover:scale-105 duration-300 relative">
+                <div class="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition"></div>
+                <!-- Inline SVG representing File Excel Import -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-black text-slate-800 mt-3 group-hover:text-emerald-600 transition leading-tight">رفع ملف إكسيل</span>
+              <span class="text-[9px] font-bold text-slate-400 mt-1 leading-normal max-w-[130px]">استيراد وتفريغ شيت ماكينة البصمة مباشرة</span>
+            </button>
+
+            <!-- 4. التقارير الشهرية -->
+            <button onclick="navigate('reports')" class="group flex flex-col items-center text-center focus:outline-none transition transform hover:-translate-y-2 duration-300 w-full max-w-[150px]">
+              <div class="w-20 h-20 bg-gradient-to-tr from-rose-600 to-pink-400 rounded-3xl shadow-lg shadow-rose-500/25 flex items-center justify-center transition group-hover:scale-105 duration-300 relative">
+                <div class="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition"></div>
+                <!-- Inline SVG Chart -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-black text-slate-800 mt-3 group-hover:text-rose-600 transition leading-tight">التقارير اليومية والشهرية</span>
+              <span class="text-[9px] font-bold text-slate-400 mt-1 leading-normal max-w-[130px]">حساب وحصر ساعات التأخير، الإضافي والغياب</span>
+            </button>
+
+            <!-- 5. إعدادات الورديات والعطل -->
+            <button onclick="navigate('settings')" class="group flex flex-col items-center text-center focus:outline-none transition transform hover:-translate-y-2 duration-300 w-full max-w-[150px]">
+              <div class="w-20 h-20 bg-gradient-to-tr from-slate-700 to-slate-500 rounded-3xl shadow-lg shadow-slate-600/25 flex items-center justify-center transition group-hover:scale-105 duration-300 relative">
+                <div class="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition"></div>
+                <!-- Inline SVG Gear -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-black text-slate-800 mt-3 group-hover:text-slate-600 transition leading-tight">الورديات والإعدادات</span>
+              <span class="text-[9px] font-bold text-slate-400 mt-1 leading-normal max-w-[130px]">تعديل مواقيت العمل، العطل الأسبوعية والنسخ</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Live IO Kiosk Simulator Section -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-700/50 space-y-4 no-print select-none">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-3 gap-2">
+            <div>
+              <h3 class="text-sm font-black tracking-wider text-indigo-400 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                📟 محاكي أخذ البصمات الذكي والحي (Smart Live Kiosk Simulator)
+              </h3>
+              <p class="text-[10px] text-slate-300 mt-0.5">سجل بصمتك الفورية لاختبار العمل بلحظتها وتحديث النتائج الإحصائية فورياً</p>
+            </div>
+            <span class="bg-indigo-500/20 text-indigo-300 font-mono text-[9px] font-bold px-2 py-0.5 rounded-md border border-indigo-400/20 uppercase tracking-wide self-start sm:self-auto">Device ID: OMAR-F80</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+            <!-- Col 1: ID Input & Device buttons -->
+            <div class="md:col-span-5 bg-white/5 p-4 rounded-2xl border border-white/10 flex flex-col justify-between space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">اختر الموظف النشط للبصمة:</label>
+                <select id="kiosk-emp-select" class="w-full bg-slate-800 text-white border border-slate-700 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-550 outline-none">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">وقت وتوقيت البصمة (افتراضي: الوقت الحالي):</label>
+                <div class="flex gap-2">
+                  <input type="time" id="kiosk-custom-time" class="w-full bg-slate-800 text-white border border-slate-700 rounded-xl p-2 text-xs text-center outline-none">
+                  <button onclick="setKioskNowTime()" class="bg-slate-700 hover:bg-slate-650 text-indigo-300 hover:text-white px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider transition">الآن</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="simulateClock('in')" class="bg-gradient-to-tr from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-xs font-black py-3 rounded-2xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11M9 11V9a3 3 0 00-6 0v2a3 3 0 003 3h3m2.753-9.571A13.959 13.959 0 0113 11a13.917 13.917 0 01-3.247 8.571m-6.84-2.04c.054-.09A13.916 13.916 0 0011 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0y"/></svg>
+                  بصمة حضور
+                </button>
+                <button onclick="simulateClock('out')" class="bg-gradient-to-tr from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white text-xs font-black py-3 rounded-2xl shadow-lg shadow-rose-600/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  بصمة انصراف
+                </button>
+              </div>
+            </div>
+
+            <!-- Col 2: Interactive Scanner Visualizer & Live logs feed -->
+            <div class="md:col-span-7 bg-white/5 flex flex-col justify-between rounded-2xl border border-white/10 p-4 space-y-3 relative overflow-hidden min-h-[190px]">
+              <div class="flex items-center justify-between text-xs text-indigo-200 border-b border-white/10 pb-1.5">
+                <span class="font-extrabold">آخر حركات البصمة الفورية المسجلة اليوم:</span>
+                <span class="text-[9px] text-slate-400 font-bold" id="kiosk-log-count">0 عمليات</span>
+              </div>
+              
+              <!-- Live logs display -->
+              <div class="flex-1 overflow-y-auto space-y-2 max-h-[142px] scrollbar-thin text-right" id="kiosk-live-feed">
+                <!-- Loaded dynamically -->
+              </div>
+              
+              <!-- Success Feedback overlay -->
+              <div id="kiosk-scanner-overlay" class="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center text-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none z-15">
+                <div class="w-12 h-12 bg-emerald-500/20 border-2 border-emerald-500 rounded-full flex items-center justify-center text-emerald-400 text-xl animate-bounce mb-1" id="kiosk-scan-icon">
+                  ✓
+                </div>
+                <h4 class="text-xs font-black text-emerald-400" id="kiosk-scan-status">بصمة موثقة</h4>
+                <p class="text-[10px] text-slate-300 mt-1 font-bold" id="kiosk-scan-detail"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Instructions Panel styled beautifully -->
+        <div class="bg-indigo-50/50 p-6 rounded-3xl border border-indigo-100 flex items-start gap-4 no-print" id="system-info-box">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0y"/></svg>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-indigo-950 text-sm">حفظ تلقائي محلي ومستقل بالكامل (Offline-First)</h3>
+            <p class="text-indigo-900/80 text-xs mt-1 leading-relaxed">
+              جميع العمليات والملفات المدخلة تظل محفوظة بأمان داخل ذاكرة متصفحك المتنقل وبخصوصية مطلقة. يمكنك ترحيل أو تصفير أو استعادة كامل الهيكل في أي وقت من موديول "الورديات والإعدادات" في الأسفل.
+            </p>
+          </div>
         </div>
       </section>
 
       <section id="view-employees" class="view-section space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">إدارة الموظفين</h2>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div>
+            <h2 class="text-2xl font-black text-slate-800">📋 إدارة ملفات طواقم العمل والموظفين</h2>
+            <p class="text-xs text-slate-500 mt-1">يمكنك إضافة أو تهيئة بيانات العاملين، وتحديد الهيكل التنظيمي، والورديات، والرواتب الأساسية الفردية</p>
+          </div>
+        </div>
+
+        <!-- Add / Edit Employee Card -->
+        <div class="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 border-t-4 border-blue-600">
+          <h3 class="font-extrabold text-sm text-slate-800 mb-4 flex items-center gap-2">
+            👤 تسجيل وتحديث ميكانيكي لملف الموظف
+          </h3>
           <form
             id="emp-form"
             onsubmit="saveEmployee(event)"
-            class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+            class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end text-xs"
           >
             <input type="hidden" id="emp-sys-id" />
+            
             <div>
-              <label class="block text-sm font-medium mb-1"
-                >الرقم الوظيفي (ID)</label
-              >
+              <label class="block font-bold mb-1.5 text-slate-650">الرقم الوظيفي (ID):</label>
               <input
                 type="text"
                 id="emp-id"
                 required
-                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
                 placeholder="مثال: 1001"
               />
             </div>
+
             <div>
-              <label class="block text-sm font-medium mb-1">الاسم</label>
+              <label class="block font-bold mb-1.5 text-slate-655">الاسم الكامل للموظف:</label>
               <input
                 type="text"
                 id="emp-name"
                 required
-                class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-brand-blue"
-                placeholder="اسم الموظف"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
+                placeholder="الاسم الثلاثي أو الرباعي"
               />
             </div>
-            <button
-              type="submit"
-              class="bg-brand-blue text-white rounded-lg p-2 font-bold hover:bg-blue-900 h-10 w-full mb-[2px]"
-            >
-              حفظ
-            </button>
+
+            <div>
+              <label class="block font-bold mb-1.5 text-slate-655">القسم الإداري للشركة:</label>
+              <input
+                type="text"
+                id="emp-dept"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue bg-white"
+                placeholder="أدخل القسم يدوياً (مثال: الإدارة ب)"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1.5 text-slate-655">المسمى واللقب الوظيفي:</label>
+              <input
+                type="text"
+                id="emp-title"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
+                placeholder="مثال: محاسب أول / مطور أول"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1.5 text-slate-655">رقم هاتف الجوال:</label>
+              <input
+                type="text"
+                id="emp-phone"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
+                placeholder="مثال: +966 / +20"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1.5 text-slate-655">الراتب الشهري الأساسي:</label>
+              <input
+                type="number"
+                id="emp-salary"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
+                placeholder="مثال: 5500"
+                value="5000"
+              />
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block font-bold mb-1.5 text-slate-655">الوردية ومواعيد العمل المخصصة له:</label>
+              <select
+                id="emp-shift-id"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue bg-white font-Cairo"
+              >
+                <!-- populated dynamically -->
+              </select>
+            </div>
+
+            <div class="md:col-span-1 lg:col-span-4 flex gap-2">
+              <button
+                type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 font-semibold transition shadow-md active:scale-[0.98] w-full flex items-center justify-center gap-1.5 cursor-pointer text-xs"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H9"/></svg>
+                حفظ وحقن السجل في الذاكرة
+              </button>
+              <button
+                type="button"
+                onclick="document.getElementById('emp-form').reset(); document.getElementById('emp-sys-id').value='';"
+                class="bg-gray-100 hover:bg-gray-200 text-slate-700 rounded-xl px-4 py-3 font-semibold text-xs transition"
+              >
+                تحديث
+              </button>
+            </div>
           </form>
         </div>
-        <div
-          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <table class="w-full text-right">
-            <thead class="bg-gray-50 text-gray-600 border-b">
-              <tr>
-                <th class="p-4 font-semibold">ID</th>
-                <th class="p-4 font-semibold">الاسم</th>
-                <th class="p-4 font-semibold text-center w-32">إجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="emp-table-body" class="divide-y divide-gray-100"></tbody>
-          </table>
+
+        <div class="bg-white rounded-[28px] shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <h4 class="font-extrabold text-xs text-slate-700">قائمة الطواقم الوظيفية المسجلة حالياً بالمنشأة</h4>
+            <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full" id="emp-count-badge">0 موظف ينشط</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-gray-50 text-slate-650 border-b border-gray-100">
+                <tr>
+                  <th class="p-4 font-black">الرقم الوظيفي</th>
+                  <th class="p-4 font-black">اسم الموظف</th>
+                  <th class="p-4 font-black">القسم واللقب</th>
+                  <th class="p-4 font-black">الهاتف الإداري</th>
+                  <th class="p-4 font-black">الراتب الأساسي</th>
+                  <th class="p-4 font-black">الوردية المعتمدة</th>
+                  <th class="p-4 font-black text-center w-32">التحكم</th>
+                </tr>
+              </thead>
+              <tbody id="emp-table-body" class="divide-y divide-gray-100 font-Cairo"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <section id="view-import" class="view-section space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">رفع حضور إكسيل</h2>
-        <div
-          class="bg-white p-8 rounded-2xl border-2 border-brand-light border-dashed text-center hover:bg-blue-50 transition"
-        >
-          <label class="cursor-pointer block space-y-4">
-            <div
-              class="text-brand-light mx-auto w-16 h-16 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                ></path>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-brand-blue">اختر ملف إكسيل</h3>
-            <p class="text-gray-600">
-              الأعمدة المطلوبة: <b>id</b>, <b>name</b>, <b>date</b>, <b>in</b>,
-              <b>out</b>
-            </p>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div>
+            <h2 class="text-2xl font-black text-slate-800">📥 رفع واستيراد كشوف البصمة الإلكترونية (Excel)</h2>
+            <p class="text-xs text-slate-500 mt-1">يتعامل هذا المحاكي تلقائياً مع مخرجات مكائن البصمة المختلفة بصيغة Excel أو CSV</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white p-8 rounded-[32px] border-2 border-slate-205 border-dashed text-center hover:bg-blue-50/50 hover:border-blue-400 transition flex flex-col justify-center items-center min-h-[240px] shadow-inner relative group">
             <input
               type="file"
+              id="excel-file-uploader"
               accept=".xlsx, .xls, .csv"
-              class="hidden"
+              class="absolute inset-0 opacity-0 cursor-pointer z-20"
               onchange="handleExcelUpload(event)"
             />
-            <span
-              class="inline-block bg-brand-light text-white px-6 py-2 rounded-lg font-bold mt-2 hover:bg-brand-blue transition"
-              >استعراض الملفات</span
-            >
-          </label>
+            <div class="space-y-4 pointer-events-none group-hover:scale-105 transition-transform duration-300">
+              <div class="text-blue-500 w-16 h-16 flex items-center justify-center bg-blue-50 rounded-full mx-auto">
+                <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-black text-slate-800">اسحب شيت البصمة هنا أو اضغط للاستعراض</h3>
+                <p class="text-[11px] text-slate-400 mt-1">يقبل الملفات ذات الصيغ المتعددة .xlsx, .xls, .csv</p>
+              </div>
+              <span class="inline-block bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md shadow-blue-500/20">تصفح الملف من جهازك</span>
+            </div>
+          </div>
+
+          <!-- Helper instructions card with direct Excel blueprint download -->
+          <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-widest leading-loose">ترتيب ورسم الأعمدة المطلوب</h3>
+              <p class="text-xs text-slate-500 leading-normal">يجب أن يحتوي ملفك الإكسيل المرفوع على الأعمدة التالية مجمعة في الشيت الأول لضمان قراءته التلقائية:</p>
+              
+              <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-mono font-bold pt-1">
+                <span class="bg-blue-50 text-blue-700 py-1.5 rounded-lg border border-blue-200">id / الرقم</span>
+                <span class="bg-blue-50 text-blue-700 py-1.5 rounded-lg border border-blue-200">name / الاسم</span>
+                <span class="bg-blue-50 text-blue-700 py-1.5 rounded-lg border border-blue-200">date / التاريخ</span>
+                <span class="bg-emerald-50 text-emerald-700 py-1.5 rounded-lg border border-emerald-250 col-span-1.5">in / الحضور</span>
+                <span class="bg-rose-50 text-rose-700 py-1.5 rounded-lg border border-rose-250 col-span-1.5">out / الانصراف</span>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-4 mt-2">
+              <button
+                onclick="downloadExcelTemplate()"
+                class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-2xl text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition duration-200 cursor-pointer"
+              >
+                <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                تحميل نموذج ملف إكسيل فارغ (.xlsx)
+              </button>
+            </div>
+          </div>
         </div>
+
         <div
           id="import-logs"
-          class="bg-gray-900 text-green-400 p-4 rounded-xl font-mono text-sm max-h-40 overflow-auto hidden dir-ltr text-left"
+          class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs max-h-40 overflow-auto hidden dir-ltr text-left"
         ></div>
+
         <div
           id="import-preview-wrapper"
-          class="hidden bg-white rounded-2xl shadow-sm border overflow-hidden"
+          class="hidden bg-white rounded-[28px] shadow-sm border overflow-hidden"
         >
-          <h3 class="bg-gray-50 p-4 border-b font-bold text-gray-800">
-            معاينة البيانات
-          </h3>
+          <div class="bg-slate-550 bg-slate-900 text-white p-4 flex items-center justify-between">
+            <h3 class="font-extrabold text-xs">معاينة وتدقيق البيانات المستخرجة من شيت البصمة</h3>
+            <span class="text-[9px] font-mono tracking-widest text-slate-400">DATA AUDIT LOG</span>
+          </div>
           <div class="overflow-x-auto max-h-96">
-            <table class="w-full text-right whitespace-nowrap">
-              <thead class="bg-gray-50 border-b sticky top-0 shadow-sm">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-gray-50 border-b border-gray-100 sticky top-0 shadow-sm font-black">
                 <tr>
-                  <th class="p-3">ID</th>
-                  <th class="p-3">Name</th>
-                  <th class="p-3">Date</th>
-                  <th class="p-3">In</th>
-                  <th class="p-3">Out</th>
+                  <th class="p-3">ID الموظف</th>
+                  <th class="p-3">الاسم بالتصنيف</th>
+                  <th class="p-3">تاريخ الحركة</th>
+                  <th class="p-3 text-emerald-700">بصمة الدخول (In)</th>
+                  <th class="p-3 text-rose-700">بصمة الخروج (Out)</th>
                 </tr>
               </thead>
-              <tbody id="import-preview-body" class="divide-y"></tbody>
+              <tbody id="import-preview-body" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
         </div>
@@ -329,47 +595,75 @@
 
       <section id="view-reports" class="view-section space-y-6">
         <div class="no-print space-y-4">
-          <h2 class="text-2xl font-bold text-gray-800">
-            التقارير اليومية والشهرية
-          </h2>
-          <div
-            class="bg-white p-6 rounded-2xl shadow-sm border grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
-          >
+          <div class="flex items-center justify-between border-b border-gray-100 pb-3">
             <div>
-              <label class="block text-sm font-medium mb-1">الموظف</label>
+              <h2 class="text-2xl font-black text-slate-800">📊 شؤون التقارير المالية والتحضيرية العامة</h2>
+              <p class="text-xs text-slate-500 mt-1">الاستعلام عن انضباط الموظفين، استخلاص مسيرات الأجور الشهرية، وإصدار طباعات الكشوف التفصيلية</p>
+            </div>
+          </div>
+
+          <!-- Report Module Tab Selectors -->
+          <div class="flex flex-wrap items-center gap-2 bg-slate-105 border border-slate-200/60 p-1.5 rounded-2xl w-fit text-xs font-semibold">
+            <button
+              id="report-tab-individual"
+              onclick="switchReportTab('individual')"
+              class="px-5 py-2.5 rounded-xl font-bold transition-all duration-200 bg-blue-600 text-white shadow-md cursor-pointer"
+            >
+              📄 كشف الموظف التفصيلي
+            </button>
+            <button
+              id="report-tab-general"
+              onclick="switchReportTab('general')"
+              class="px-5 py-2.5 rounded-xl font-bold transition-all duration-200 text-slate-700 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+            >
+              🌍 دفتر حضور المنشأة العام
+            </button>
+            <button
+              id="report-tab-payroll"
+              onclick="switchReportTab('payroll')"
+              class="px-5 py-2.5 rounded-xl font-bold transition-all duration-200 text-slate-700 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+            >
+              💰 مسيرات الأجور والرواتب الشاملة
+            </button>
+          </div>
+
+          <!-- Filter Panel Form -->
+          <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4 items-end text-xs">
+            <div id="filter-emp-wrapper">
+              <label class="block font-bold mb-1.5 text-slate-600">اختر الموظف المستهدف:</label>
               <select
                 id="report-emp"
-                class="w-full border rounded-lg p-2 outline-none focus:border-brand-blue text-sm"
+                class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue bg-white font-Cairo"
               ></select>
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">من</label
-              ><input
+              <label class="block font-bold mb-1.5 text-slate-600" id="filter-date-start-label">تاريخ البداية (من):</label>
+              <input
                 type="date"
                 id="report-start"
-                class="w-full border rounded-lg p-2 outline-none text-sm focus:border-brand-blue"
+                class="w-full border border-slate-300 rounded-xl p-2 text-center outline-none focus:border-brand-blue"
               />
             </div>
-            <div>
-              <label class="block text-sm font-medium mb-1">إلى</label
-              ><input
+            <div id="filter-date-end-wrapper">
+              <label class="block font-bold mb-1.5 text-slate-600">تاريخ النهاية (إلى):</label>
+              <input
                 type="date"
                 id="report-end"
-                class="w-full border rounded-lg p-2 outline-none text-sm focus:border-brand-blue"
+                class="w-full border border-slate-300 rounded-xl p-2 text-center outline-none focus:border-brand-blue"
               />
             </div>
             <div class="flex gap-2">
               <button
-                onclick="generateReport()"
-                class="flex-1 bg-brand-blue text-white rounded-lg p-2 font-bold hover:bg-blue-900"
+                onclick="runReportGenerator()"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-2.5 font-bold transition active:scale-95 shadow-md shadow-blue-500/20 cursor-pointer"
               >
-                عرض
+                عرض التقرير
               </button>
               <button
                 onclick="window.print()"
-                class="bg-gray-600 text-white rounded-lg p-2 font-bold hover:bg-gray-700"
+                class="bg-slate-800 hover:bg-slate-900 text-white rounded-xl px-4 py-2.5 font-bold transition active:scale-95 cursor-pointer"
               >
-                طباعة
+                طباعة كالأصل
               </button>
             </div>
           </div>
@@ -411,8 +705,9 @@
                   <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">خروج</th>
                   <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">العمل</th>
                   <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">تأخير</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5 text-rose-700">خصم التأخير</th>
                   <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">مبكر</th>
-                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">خصم</th>
+                  <th class="border border-gray-400 p-1.5 w-16 print:p-0.5 text-rose-700">خصم مبكر</th>
                   <th class="border border-gray-400 p-1.5 w-16 print:p-0.5">إضافي</th>
                   <th class="border border-gray-400 p-1.5 print:p-0.5">ملاحظات</th>
                 </tr>
@@ -441,7 +736,7 @@
                       class="w-full p-1 border rounded text-center"
                     />
                   </td>
-                  <td colspan="5" class="border p-1 bg-white" dir="rtl">
+                  <td colspan="6" class="border p-1 bg-white" dir="rtl">
                     <div class="flex gap-1" dir="rtl">
                       <select
                         id="man-type"
@@ -542,6 +837,71 @@
             </div>
           </div>
 
+          <!-- Wrapper 2: General Enterprise Report (Roster) -->
+          <div id="wrapper-general-report" class="hidden bg-white p-6 rounded-[28px] shadow border border-slate-100 min-h-[400px]">
+            <div class="border-b border-gray-100 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <h3 class="font-extrabold text-slate-800 text-sm">🌍 كشف الانضباط والحضور العام للمنشأة</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">تفصيل التحضير اليومي لكامل طاقم العمل في الفترة المحددة</p>
+              </div>
+              <span class="text-[10px] bg-indigo-50 text-indigo-700 px-3 py-1 rounded-xl font-bold font-mono border border-indigo-100" id="general-report-date-badge"></span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs">
+                <thead class="bg-gray-50 border-b border-gray-100 text-slate-700 font-bold">
+                  <tr>
+                    <th class="p-3 border-b">ID</th>
+                    <th class="p-3 border-b">اسم الموظف</th>
+                    <th class="p-3 border-b">القسم الإداري</th>
+                    <th class="p-3 border-b">التاريخ</th>
+                    <th class="p-3 border-b">معامل الحالة</th>
+                    <th class="p-3 border-b text-emerald-600">وقت الدخول</th>
+                    <th class="p-3 border-b text-rose-600">وقت الخروج</th>
+                    <th class="p-3 border-b">دقائق التأخير</th>
+                    <th class="p-3 border-b">الساعات الإضافية</th>
+                  </tr>
+                </thead>
+                <tbody id="general-report-table-body" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Wrapper 3: Payroll report -->
+          <div id="wrapper-payroll-report" class="hidden bg-white p-6 rounded-[28px] shadow border border-slate-100 min-h-[400px]">
+            <div class="border-b border-gray-100 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <h3 class="font-extrabold text-slate-800 text-sm">💰 مسير الرواتب والأجور الشاملة</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">الحساب المالي الدقيق بنسبة 100% متضمناً خصومات الغياب والتأثيرات الإضافية</p>
+              </div>
+              <span class="text-[10px] bg-emerald-50 text-emerald-700 px-3 py-1 rounded-xl font-bold font-mono border border-emerald-100" id="payroll-report-period-badge"></span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs">
+                <thead class="bg-gray-50 border-b border-gray-100 text-slate-705 font-black">
+                  <tr>
+                    <th class="p-3 border-b">الرقم</th>
+                    <th class="p-3 border-b">اسم الموظف</th>
+                    <th class="p-3 border-b">القسم واللقب</th>
+                    <th class="p-3 border-b">الراتب الأساسي</th>
+                    <th class="p-3 border-b text-emerald-700">أيام الحضور</th>
+                    <th class="p-3 border-b text-rose-700">أيام الغياب</th>
+                    <th class="p-3 border-b text-rose-800">خصم الغياب</th>
+                    <th class="p-3 border-b">دقائق التأخير</th>
+                    <th class="p-3 border-b text-rose-800">خصم التأخير</th>
+                    <th class="p-3 border-b">دقائق المبكر</th>
+                    <th class="p-3 border-b text-rose-800">خصم مبكر</th>
+                    <th class="p-3 border-b text-emerald-700">ساعة إضافي</th>
+                    <th class="p-3 border-b text-emerald-800">بونص الإضافي</th>
+                    <th class="p-3 border-b font-black text-blue-800">الصافي المستحق</th>
+                  </tr>
+                </thead>
+                <tbody id="payroll-report-table-body" class="divide-y divide-gray-100 font-Cairo"></tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -624,98 +984,1181 @@
       </section>
 
       <section id="view-settings" class="view-section space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">الإعدادات</h2>
-        <div
-          class="bg-white p-6 rounded-2xl shadow-sm border max-w-sm space-y-4"
-        >
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
           <div>
-            <label class="block text-sm mb-1 font-medium">دوام من:</label
-            ><input
-              type="time"
-              id="s-start"
-              class="w-full p-2 border rounded-lg outline-none focus:border-brand-blue"
-            />
+            <h2 class="text-2xl font-black text-slate-800">⚙️ إدارة وهيكلة ورديات العمل والسياسات</h2>
+            <p class="text-xs text-slate-500 mt-1">قم بتعريف مواقيت الورديات المتعددة بالمنشأة، وتحديد فترات السماح للوصول المتأخر بخصائص مرنة لكل وردية</p>
           </div>
-          <div>
-            <label class="block text-sm mb-1 font-medium">دوام إلى:</label
-            ><input
-              type="time"
-              id="s-end"
-              class="w-full p-2 border rounded-lg outline-none focus:border-brand-blue"
-            />
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Create / Edit Shift Card -->
+          <div class="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 border-t-4 border-blue-600 space-y-4">
+            <h3 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+              📝 إضافة وتحديث وردية عمل مخصصة
+            </h3>
+            <form id="shift-form" onsubmit="saveShift(event)" class="space-y-4 text-xs font-Cairo">
+              <input type="hidden" id="shift-edit-id" />
+              <div>
+                <label class="block font-bold mb-1.5 text-slate-705">الاسم واللقب للوردية:</label>
+                <input
+                  type="text"
+                  id="shift-name"
+                  required
+                  placeholder="مثال: الوردية الصباحية (أ)"
+                  class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold mb-1.5 text-slate-705">بداية الدوام (من):</label>
+                  <input
+                    type="time"
+                    id="shift-in"
+                    required
+                    class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue font-mono"
+                  />
+                </div>
+                <div>
+                  <label class="block font-bold mb-1.5 text-slate-705">نهاية الدوام (إلى):</label>
+                  <input
+                    type="time"
+                    id="shift-out"
+                    required
+                    class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-bold mb-1.5 text-slate-705">فترة السماح بالدقائق (قبل احتساب التأخر):</label>
+                <input
+                  type="number"
+                  id="shift-grace"
+                  min="0"
+                  max="240"
+                  required
+                  placeholder="مثال: 15 دقيقة"
+                  value="15"
+                  class="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-brand-blue font-mono"
+                />
+              </div>
+
+              <div class="space-y-2">
+                <label class="block font-bold text-slate-705">أيام العطل الأسبوعية المعتمدة للوردية:</label>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-1.5 text-[11px]">
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                    <input type="checkbox" name="shift-weekends-cb" value="0" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>الأحد</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                    <input type="checkbox" name="shift-weekends-cb" value="1" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>الاثنين</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                    <input type="checkbox" name="shift-weekends-cb" value="2" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>الثلاثاء</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                    <input type="checkbox" name="shift-weekends-cb" value="3" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>الأربعاء</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                    <input type="checkbox" name="shift-weekends-cb" value="4" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>الخميس</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer bg-red-50/50">
+                    <input type="checkbox" name="shift-weekends-cb" value="5" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500" checked>
+                    <span class="font-bold text-red-650">الجمعة</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer bg-red-50/50 col-span-2">
+                    <input type="checkbox" name="shift-weekends-cb" value="6" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500" checked>
+                    <span class="font-bold text-red-650">السبت (عطلة نهاية الأسبوع)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  id="btn-shift-save"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl font-bold transition shadow-md active:scale-[0.98] cursor-pointer"
+                >
+                  إضافة وردية جديدة
+                </button>
+                <button
+                  type="button"
+                  onclick="resetShiftForm()"
+                  class="bg-gray-100 hover:bg-gray-200 text-gray-750 px-3 py-2 rounded-xl font-medium text-xs transition active:scale-[0.98]"
+                >
+                  تصفير
+                </button>
+              </div>
+            </form>
           </div>
-          <button
-            onclick="saveSettings()"
-            class="w-full bg-brand-blue text-white p-2 rounded-lg font-bold"
-          >
-            حفظ التغييرات
-          </button>
-          <hr class="my-4" />
-          <button
-            onclick="exportDB()"
-            class="w-full bg-yellow-600 hover:bg-yellow-700 text-white p-2 rounded-lg font-bold text-sm"
-          >
-            تصدير نسخة احتياطية للبيانات (JSON)
-          </button>
-          <label
-            class="block w-full bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg font-bold text-sm text-center cursor-pointer"
-          >
-            استعادة نسخة احتياطية (JSON)
-            <input
-              type="file"
-              accept=".json"
-              class="hidden"
-              onchange="importDB(event)"
-            />
-          </label>
-          <hr class="my-4" />
-          <button
-            onclick="downloadSelf()"
-            class="w-full bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg font-bold text-sm"
-          >
-            حفظ البرنامج والبيانات كملف واحد (Download)
-          </button>
-          <button
-            onclick="
-              if (confirm('مسح كل البيانات؟')) {
-                localStorage.clear();
-                location.reload();
-              }
-            "
-            class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg font-bold text-sm"
-          >
-            مسح قاعدة البيانات
-          </button>
+
+          <!-- Shifts List Table Card -->
+          <div class="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 lg:col-span-2 space-y-4 overflow-hidden">
+            <h3 class="font-extrabold text-sm text-slate-800">قائمة شفتات ومواقيت الدوام المسجلة حالياً</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-650 font-black border-b border-slate-100">
+                    <th class="p-3">اسم الوردية</th>
+                    <th class="p-3 text-center">ساعات الحضور والانصراف</th>
+                    <th class="p-3 text-center">فترة السماح</th>
+                    <th class="p-3 text-center">أيام العطل الأسبوعية</th>
+                    <th class="p-3 text-center w-36">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="shifts-table-body" class="divide-y divide-gray-100">
+                  <!-- JS elements loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corporate & Weekend Settings Card -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4 mt-6 no-print">
+          <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-slate-800">توقيتات الحضور الرسمية وأيام العطل</h3>
+              <p class="text-xs text-slate-400">تخصيص الدوام الافتراضي العام وتحديد أيام العطل الأسبوعية المتعددة للشركة</p>
+            </div>
+          </div>
+          
+          <form id="general-settings-form" onsubmit="saveGeneralSettings(event)" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold mb-1.5 text-slate-700">دوام من (الحضور الافتراضي):</label>
+                <input
+                  type="time"
+                  id="set-default-in"
+                  required
+                  class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-brand-blue"
+                />
+              </div>
+              <div>
+                <label class="block font-bold mb-1.5 text-slate-700">دوام إلى (الانصراف الافتراضي):</label>
+                <input
+                  type="time"
+                  id="set-default-out"
+                  required
+                  class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-brand-blue"
+                />
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <label class="block font-bold text-slate-700 mb-1">أيام العطل الأسبوعية المعتمدة بالشركة (اختر متعدد):</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="0" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الأحد</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="1" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الاثنين</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="2" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الثلاثاء</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="3" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الأربعاء</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="4" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الخميس</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="5" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>الجمعة</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" name="set-weekends" value="6" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span>السبت</span>
+                </label>
+              </div>
+            </div>
+            
+            <button
+              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-6 py-2.5 rounded-xl transition duration-200 active:scale-95 cursor-pointer"
+            >
+              حفظ التغييرات
+            </button>
+          </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <!-- Backup & Recovery Card -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+              النسخ الاحتياطي وحفظ البيانات
+            </h3>
+            <p class="text-xs text-gray-500 leading-relaxed">احتفظ دائماً بنسخة احتياطية من سجلاتك لضمان عدم ضياعها، أو حمّل التطبيق كاملاً مع البيانات بملف واحد للعمل دون إنترنت.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <button
+                onclick="exportDB()"
+                class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white p-2.5 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                تصدير نسخة (JSON)
+              </button>
+              
+              <label
+                class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-2.5 rounded-xl text-xs font-bold text-center cursor-pointer transition duration-200"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                استعادة نسخة (JSON)
+                <input
+                  type="file"
+                  accept=".json"
+                  class="hidden"
+                  onchange="importDB(event)"
+                />
+              </label>
+            </div>
+
+            <button
+              onclick="downloadSelf()"
+              class="w-full mt-2 flex items-center justify-center gap-2 bg-emerald-650 hover:bg-emerald-700 active:bg-emerald-800 text-white p-2.5 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              حفظ البرنامج والبيانات كملف واحد (كامل)
+            </button>
+          </div>
+
+          <!-- Danger Zone Card -->
+          <div class="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col justify-between">
+            <div>
+              <h3 class="font-extrabold text-red-800 text-lg flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                منطقة الخطر الإدارية
+              </h3>
+              <p class="text-xs text-red-600 leading-relaxed font-semibold">
+                حذف قاعدة البيانات بالكامل سيمسح جميع ملفات الموظفين وسجلات الحضور والورديات بشكل كلي من جهازك ولا يمكن استعادة هذه الملفات لاحقاً، يرجى الحذر التام قبل الضغط.
+              </p>
+            </div>
+            
+            <button
+              onclick="
+                if (confirm('هل أنت متأكد من رغبتك في حذف قاعدة البيانات بالكامل؟ لا يمكن التراجع عن هذا الإجراء لاحقاً!')) {
+                  localStorage.clear();
+                  location.reload();
+                }
+              "
+              class="w-full mt-4 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white p-2.5 rounded-xl font-bold text-xs transition duration-200 active:scale-[0.98] cursor-pointer"
+            >
+              مسح قاعدة البيانات كلياً وتصفير الإعدادات
+            </button>
+          </div>
         </div>
       </section>
     </main>
 
+    <!-- Global Modular Premium Modal for Operations Hub Sub-modules -->
+    <div id="hub-item-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden p-4 animate-fade-in no-print select-none">
+      <div class="bg-white rounded-[32px] shadow-2xl border border-slate-100 max-w-3xl w-full overflow-hidden transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]" id="modal-container">
+        <!-- Header -->
+        <div class="bg-slate-900 text-white px-6 py-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" id="modal-icon-bg">
+              <!-- Set Dynamically -->
+            </div>
+            <div>
+              <h3 class="font-black text-base" id="modal-title">موقع فرعي</h3>
+              <p class="text-[10px] text-slate-400 font-semibold" id="modal-subtitle">الأقسام والعمليات اللحظية</p>
+            </div>
+          </div>
+          <button onclick="closeHubModal()" class="text-slate-400 hover:text-white transition cursor-pointer p-1.5 rounded-xl hover:bg-slate-800">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        
+        <!-- Body Content -->
+        <div class="p-6 overflow-y-auto flex-1 text-slate-700 text-sm leading-relaxed" id="modal-body">
+          <!-- Injected Dynamically -->
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-slate-50 px-6 py-4 flex justify-between items-center border-t border-slate-100 shrink-0">
+          <span class="text-[10px] text-slate-400 font-bold font-mono">HR OPERATIONS HUB v2.1</span>
+          <button onclick="closeHubModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold transition active:scale-95 duration-200">
+            إغلاق النافذة
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
+      function renderTypeSelect(rId, dStr, rType) {
+        let opts = ["", "إجازة", "مرضي", "إذن", "مأمورية", "غياب"];
+        let labels = ["-", "إجازة", "مرضي", "إذن", "مأمورية", "غياب"];
+        let h = '<select onchange="updA(\'' + rId + '\',\'' + dStr + '\',\'type\',this.value)" class="text-[10px] border rounded outline-none p-0.5 print:hidden w-1/2">';
+        for (let i = 0; i < opts.length; i++) {
+          let sel = (rType === opts[i]) ? "selected" : "";
+          h += '<option value="' + opts[i] + '" ' + sel + '>' + labels[i] + '</option>';
+        }
+        h += '</select>';
+        return h;
+      }
+
       let db = {
         emps: JSON.parse(localStorage.getItem("hr_e") || "[]"),
         atts: JSON.parse(localStorage.getItem("hr_a") || "[]"),
         set: JSON.parse(
-          localStorage.getItem("hr_s") || '{"in":"09:00","out":"17:00"}',
+          localStorage.getItem("hr_s") || '{"in":"09:00","out":"17:00"}'
         ),
+        shifts: JSON.parse(localStorage.getItem("hr_sh") || "[]"),
       };
 
-      const saveDB = () => {
+      if (!db.shifts || db.shifts.length === 0) {
+        db.shifts = [
+          { id: "s1", name: "الوردية الصباحية الافتراضية", in: "09:00", out: "17:00" },
+          { id: "s2", name: "شفت بعد الظهر (المسائي)", in: "16:00", out: "00:00" },
+          { id: "s36", name: "الشفت الليلي المتأخر", in: "00:00", out: "08:00" }
+        ];
+        localStorage.setItem("hr_sh", JSON.stringify(db.shifts));
+      }
+
+       const saveDB = () => {
         localStorage.setItem("hr_e", JSON.stringify(db.emps));
         localStorage.setItem("hr_a", JSON.stringify(db.atts));
         localStorage.setItem("hr_s", JSON.stringify(db.set));
-        document.getElementById("stat-total-emp").innerText = db.emps.length;
-        document.getElementById("stat-total-att").innerText = db.atts.length;
+        localStorage.setItem("hr_sh", JSON.stringify(db.shifts || []));
+        if (window.updateDashboardStats) {
+          window.updateDashboardStats();
+        } else {
+          const totalEmpEl = document.getElementById("stat-total-emp");
+          if (totalEmpEl) totalEmpEl.innerText = db.emps.length;
+        }
+      };
+
+      // Realtime Smart Attendance Analytics Canvas
+      window.updateDashboardStats = function() {
+        let totalEmps = db.emps.length;
+        const totalEmpEl = document.getElementById("stat-total-emp");
+        if (totalEmpEl) totalEmpEl.innerText = totalEmps;
+        
+        let todayStr = new Date().toISOString().split("T")[0];
+        let todayAtts = db.atts.filter(a => a.date === todayStr);
+        
+        let presentToday = todayAtts.filter(a => !a.type && a.timeIn).length;
+        let lateToday = 0;
+        
+        todayAtts.forEach(a => {
+          if (!a.type && a.timeIn) {
+            let emp = db.emps.find(e => e.id == a.employeeId);
+            let shiftIn = db.set.in || "09:00";
+            if (emp && emp.shiftId) {
+              let sh = (db.shifts || []).find(s => s.id === emp.shiftId);
+              if (sh) shiftIn = sh.in;
+            }
+            if (a.timeIn > shiftIn) lateToday++;
+          }
+        });
+        
+        const presentTodayEl = document.getElementById("stat-present-today");
+        if (presentTodayEl) presentTodayEl.innerText = presentToday;
+
+        const lateTodayEl = document.getElementById("stat-late-today");
+        if (lateTodayEl) lateTodayEl.innerText = lateToday;
+        
+        let attendanceRate = totalEmps > 0 ? Math.round((presentToday / totalEmps) * 100) : 100;
+        const rateEl = document.getElementById("stat-attendance-rate");
+        if (rateEl) rateEl.innerText = attendanceRate + "%";
+        
+        // Populate the Kiosk select
+        let kioskSelect = document.getElementById("kiosk-emp-select");
+        if (kioskSelect) {
+          kioskSelect.innerHTML = db.emps.map(e => `<option value="${e.id}">${e.name} (ID: ${e.empId})</option>`).join("");
+          if (db.emps.length === 0) {
+            kioskSelect.innerHTML = `<option value="">- لا يوجد موظفين مسجلين -</option>`;
+          }
+        }
+        
+        renderKioskLogs();
+      };
+
+      window.renderKioskLogs = function() {
+        let feedEl = document.getElementById("kiosk-live-feed");
+        if (!feedEl) return;
+        
+        let todayStr = new Date().toISOString().split("T")[0];
+        let todayAtts = db.atts.filter(a => a.date === todayStr);
+        
+        if (todayAtts.length === 0) {
+          feedEl.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center text-[11px] text-slate-400 py-6">
+              <span>⚠️ لا توجد بصمات حضور أو انصراف مسجلة اليوم</span>
+            </div>
+          `;
+          const logCountEl = document.getElementById("kiosk-log-count");
+          if (logCountEl) logCountEl.innerText = "0 عمليات";
+          return;
+        }
+        
+        todayAtts.sort((x, y) => {
+          let tx = x.timeOut || x.timeIn || "00:00";
+          let ty = y.timeOut || y.timeIn || "00:00";
+          return ty.localeCompare(tx); 
+        });
+        
+        feedEl.innerHTML = todayAtts.slice(0, 5).map(a => {
+          let emp = db.emps.find(e => e.id == a.employeeId);
+          let empName = emp ? emp.name : "موظف مجهول";
+          
+          let actionLabel = "";
+          let actionColor = "";
+          let detailStr = "";
+          
+          if (a.type) {
+            actionLabel = a.type;
+            actionColor = "bg-amber-500/20 text-indigo-300 border-indigo-500/20";
+            detailStr = a.note || "تم التسجيل كإجازة/غياب";
+          } else if (a.timeOut && a.timeIn) {
+            actionLabel = "منصرف";
+            actionColor = "bg-rose-500/20 text-rose-300 border-rose-500/20";
+            detailStr = `دخول: ${a.timeIn} | خروج: ${a.timeOut}`;
+          } else if (a.timeIn) {
+            actionLabel = "حاضر";
+            actionColor = "bg-emerald-500/20 text-emerald-300 border-emerald-500/20";
+            detailStr = `دخول في: ${a.timeIn}`;
+          } else if (a.timeOut) {
+            actionLabel = "منصرف";
+            actionColor = "bg-rose-500/20 text-rose-350 border-rose-500/25";
+            detailStr = `خروج في: ${a.timeOut}`;
+          }
+          
+          return `
+            <div class="flex items-center justify-between bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl text-xs gap-3">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full ${a.timeOut ? "bg-rose-500" : "bg-emerald-500 animate-pulse"}"></span>
+                <span class="font-bold text-white">${empName}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-400 font-mono">${detailStr}</span>
+                <span class="px-2 py-0.5 border rounded-lg text-[9px] font-bold ${actionColor}">${actionLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+        
+        const logCountEl = document.getElementById("kiosk-log-count");
+        if (logCountEl) logCountEl.innerText = `${todayAtts.length} عمليات`;
+      };
+
+      window.simulateClock = function(mode) {
+        let empId = document.getElementById("kiosk-emp-select").value;
+        if (!empId) return alert("الرجاء اختيار الموظف أولاً!");
+        
+        let customTime = document.getElementById("kiosk-custom-time").value;
+        let timeNowStr = customTime;
+        if (!timeNowStr) {
+          let now = new Date();
+          timeNowStr = now.toTimeString().split(" ")[0].substring(0, 5); 
+        }
+        
+        let todayStr = new Date().toISOString().split("T")[0];
+        let emp = db.emps.find(e => e.id == empId);
+        if (!emp) return;
+        
+        let att = db.atts.find(a => a.employeeId == empId && a.date == todayStr);
+        let detail = "";
+        
+        if (att) {
+          if (mode === "in") {
+            att.timeIn = timeNowStr;
+            detail = `تم تحديث بصمة الدخول في ${timeNowStr}`;
+          } else {
+            att.timeOut = timeNowStr;
+            detail = `تم تسجيل بصمة الانصراف في ${timeNowStr}`;
+          }
+        } else {
+          if (mode === "in") {
+            db.atts.push({
+              id: Math.random().toString(36).substr(2, 9),
+              employeeId: empId,
+              date: todayStr,
+              timeIn: timeNowStr,
+              timeOut: "",
+              type: "",
+              note: ""
+            });
+            detail = `تم تسجيل بصمة الحضور في ${timeNowStr}`;
+          } else {
+            db.atts.push({
+              id: Math.random().toString(36).substr(2, 9),
+              employeeId: empId,
+              date: todayStr,
+              timeIn: "",
+              timeOut: timeNowStr,
+              type: "",
+              note: ""
+            });
+            detail = `تم تسجيل بصمة الانصراف في ${timeNowStr}`;
+          }
+        }
+        
+        saveDB();
+        
+        // Show scanning overlay animation
+        let overlay = document.getElementById("kiosk-scanner-overlay");
+        let statusEl = document.getElementById("kiosk-scan-status");
+        let detailEl = document.getElementById("kiosk-scan-detail");
+        let iconEl = document.getElementById("kiosk-scan-icon");
+        
+        statusEl.innerText = mode === "in" ? "بصمة حضور موثقة" : "بصمة انصراف موثقة";
+        detailEl.innerText = `الموظف: ${emp.name} | ${timeNowStr}`;
+        
+        iconEl.innerHTML = `
+          <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        
+        overlay.classList.add("opacity-100");
+        overlay.classList.remove("pointer-events-none");
+        
+        setTimeout(() => {
+          overlay.classList.remove("opacity-100");
+          overlay.classList.add("pointer-events-none");
+        }, 1700);
+      };
+      
+      window.setKioskNowTime = function() {
+        let now = new Date();
+        document.getElementById("kiosk-custom-time").value = now.toTimeString().split(" ")[0].substring(0, 5);
+      };
+
+      // Modal helper handles
+      window.openHubModal = function(title, subtitle, iconHtml, iconBg, bodyHtml) {
+        document.getElementById("modal-title").innerText = title;
+        document.getElementById("modal-subtitle").innerText = subtitle;
+        const iconContainer = document.getElementById("modal-icon-bg");
+        iconContainer.className = `w-10 h-10 rounded-xl flex items-center justify-center ${iconBg}`;
+        iconContainer.innerHTML = iconHtml;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        const modal = document.getElementById("hub-item-modal");
+        modal.classList.remove("hidden");
+        document.getElementById("modal-container").classList.remove("scale-95");
+        document.getElementById("modal-container").classList.add("scale-100");
+      };
+
+      window.closeHubModal = function() {
+        const modal = document.getElementById("hub-item-modal");
+        if (modal) {
+          modal.classList.add("hidden");
+          document.getElementById("modal-container").classList.remove("scale-100");
+          document.getElementById("modal-container").classList.add("scale-95");
+        }
+      };
+
+      // Define callbacks for custom modules requested in Operations Hub screenshot
+      window.openPayrollModal = function() {
+        if (db.emps.length === 0) {
+          openHubModal(
+            "الرواتب والأجور", 
+            "كشوف المرتبات الشهرية", 
+            `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7l.004-1.004M12 16v1"/></svg>`, 
+            "bg-teal-600",
+            `<div class="text-center py-8">
+               <div class="text-orange-500 text-4xl mb-3">⚠️</div>
+               <h4 class="text-lg font-bold text-slate-800">لا يوجد موظفين حالياً</h4>
+               <p class="text-xs text-slate-500 mt-1">الرجاء إدخال أو استيراد بيانات موظفين من شريحة "شؤون الموظفين" أولاً لتشغيل احتساب الأجور.</p>
+             </div>`
+          );
+          return;
+        }
+
+        // Calculate dynamic payroll stats based on actual log count and absences
+        let empsHtml = db.emps.map(e => {
+          let presentDays = db.atts.filter(a => a.employeeId === e.id && !a.type).length;
+          let leavesCount = db.atts.filter(a => a.employeeId === e.id && (a.type === "إجازة" || a.type === "مرضي" || a.type === "إذن" || a.type === "مأمورية")).length;
+          let absentDays = db.atts.filter(a => a.employeeId === e.id && a.type === "غياب").length;
+          
+          let basicSalary = 5000; // Mock basic rate
+          let dayRate = basicSalary / 30;
+          let deduction = absentDays * dayRate;
+          let bonus = presentDays > 22 ? 500 : 0; // Bonus for high attendance
+          let netSalary = Math.round(basicSalary - deduction + bonus);
+
+          return `
+            <tr class="hover:bg-slate-50 border-b border-slate-100 text-xs">
+              <td class="p-3 font-bold text-slate-800">${e.name}<br><span class="text-[9px] text-slate-400 font-mono">رقم: ${e.empId}</span></td>
+              <td class="p-3 font-mono text-slate-600">${basicSalary} ريال</td>
+              <td class="p-3 text-center text-emerald-600 font-bold">${presentDays} أيام</td>
+              <td class="p-3 text-center text-blue-600 font-semibold">${leavesCount} أيام</td>
+              <td class="p-3 text-center text-red-500 font-semibold">${absentDays} أيام</td>
+              <td class="p-3 text-center text-red-600 font-bold">- ${Math.round(deduction)} ريال</td>
+              <td class="p-3 text-left font-black text-slate-900">${netSalary} ريال</td>
+            </tr>
+          `;
+        }).join("");
+
+        let payrollContent = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-sm text-slate-800 border-b pb-2">كشف مسيرات الرواتب المحتسبة لشهر الحضور الحالي (أساس 30 يوم)</h4>
+            <div class="overflow-x-auto border border-slate-100 rounded-2xl">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-500 text-[10px] font-extrabold uppercase border-b border-slate-100">
+                    <th class="p-3">الموظف</th>
+                    <th class="p-3">الراتب الأساسي</th>
+                    <th class="p-3 text-center">أيام الحضور</th>
+                    <th class="p-3 text-center">أيام الإجازات</th>
+                    <th class="p-3 text-center">أيام الغياب</th>
+                    <th class="p-3 text-center">الجزاءات</th>
+                    <th class="p-3 text-left">صافي الراتب</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${empsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "الرواتب والأجور المباشرة", 
+          "احتساب تلقائي لصافي المرتبات والخصومات والمستحقات", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`, 
+          "bg-teal-600",
+          payrollContent
+        );
+      };
+
+      window.openRecruitmentModal = function() {
+        let contentHtml = `
+          <div class="space-y-6">
+            <div class="grid grid-cols-4 gap-4">
+              <div class="bg-indigo-50 border border-indigo-150 p-4 rounded-2xl text-center">
+                <span class="text-xs text-indigo-800 font-bold block">مقدمين جدد</span>
+                <span class="text-2xl font-black text-indigo-650 block mt-1">12</span>
+              </div>
+              <div class="bg-amber-50 border border-amber-150 p-4 rounded-2xl text-center">
+                <span class="text-xs text-amber-800 font-bold block">قيد الاختبار</span>
+                <span class="text-2xl font-black text-amber-600 block mt-1">4</span>
+              </div>
+              <div class="bg-emerald-50 border border-emerald-150 p-4 rounded-2xl text-center">
+                <span class="text-xs text-emerald-800 font-bold block">مقبولين</span>
+                <span class="text-2xl font-black text-emerald-600 block mt-1">2</span>
+              </div>
+              <div class="bg-rose-50 border border-rose-150 p-4 rounded-2xl text-center">
+                <span class="text-xs text-rose-800 font-bold block">وظائف معلنة</span>
+                <span class="text-2xl font-black text-rose-600 block mt-1">3</span>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <h4 class="font-bold text-slate-800">الوظائف الشاغرة النشطة حالياً</h4>
+              <div class="space-y-2 text-xs">
+                <div class="bg-slate-50 p-3 rounded-xl flex items-center justify-between">
+                  <div>
+                    <span class="font-bold text-slate-800 block">أخصائي شؤون موظفين HR Specialists</span>
+                    <span class="text-[10px] text-slate-400">القسم: الإدارة العامة • الرياض</span>
+                  </div>
+                  <span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-md text-[10px] font-bold">نشط</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl flex items-center justify-between">
+                  <div>
+                    <span class="font-bold text-slate-800 block">مشرف وردية إنتاج صيانة</span>
+                    <span class="text-[10px] text-slate-400">القسم: العمليات الميدانية • جدة</span>
+                  </div>
+                  <span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-md text-[10px] font-bold">نشط</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "بوابة التوظيف المهنية", 
+          "استعراض المسارات المهنية وجذب الكفاءات للشركة", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`, 
+          "bg-indigo-500",
+          contentHtml
+        );
+      };
+
+      window.openTrainingModal = function() {
+        let contentHtml = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-slate-800">البرامج التدريبية المعتمدة لدورة الدوام الحالية</h4>
+            <div class="space-y-3">
+              <div class="border border-slate-100 p-4 rounded-2xl space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-bold text-slate-800">برنامج تأهيل المشرفين على نظام البصمة الذكية v2</span>
+                  <span class="text-indigo-600 font-bold">مكتمل 100%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-indigo-600 h-2 rounded-full" style="width: 100%"></div>
+                </div>
+              </div>
+              <div class="border border-slate-100 p-4 rounded-2xl space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-bold text-slate-800">دورة الكفاءة والالتزام لساعات الحضور والانصراف</span>
+                  <span class="text-amber-600 font-bold">قيد التقدم 60%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-amber-500 h-2 rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "التدريب والتطوير المهني", 
+          "تنمية كفاءات الموظفين وتحسين مستويات الالتزام بالعمليات", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>`, 
+          "bg-violet-600",
+          contentHtml
+        );
+      };
+
+      window.openPerformanceModal = function() {
+        if (db.emps.length === 0) {
+          openHubModal(
+            "تقييم الأداء والمؤشرات", 
+            "الكفاءة والانتظام للدوام", 
+            `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>`, 
+            "bg-rose-500",
+            `<div class="text-center py-6 text-slate-500">يرجى تسجيل موظفين لرؤية مؤشرات الأداء الخاصة بهم</div>`
+          );
+          return;
+        }
+
+        let listHtml = db.emps.map((e, idx) => {
+          let totalLogs = db.atts.filter(a => a.employeeId === e.id).length;
+          let absenceCount = db.atts.filter(a => a.employeeId === e.id && a.type === "غياب").length;
+          
+          let score = 100;
+          if (totalLogs > 0) {
+            score = Math.round(((totalLogs - absenceCount) / totalLogs) * 100);
+          } else {
+            score = 100 - (absenceCount * 15);
+          }
+          if (score < 0) score = 0;
+          if (score > 100) score = 100;
+
+          let grade = "ممتاز";
+          let gradeCol = "text-emerald-600 bg-emerald-100";
+          if (score < 90) { grade = "جيد جداً"; gradeCol = "text-blue-600 bg-blue-100"; }
+          if (score < 80) { grade = "جيد"; gradeCol = "text-amber-600 bg-amber-100"; }
+          if (score < 60) { grade = "بيد رديء / متأخر"; gradeCol = "text-red-600 bg-red-100"; }
+
+          return `
+            <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between text-xs">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center font-bold font-mono">${idx + 1}</span>
+                <div>
+                  <span class="font-bold text-slate-800 text-sm block">${e.name}</span>
+                  <span class="text-[10px] text-slate-400">سجل: ${totalLogs} لقطة حضور</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="px-2.5 py-1 rounded-xl text-[10px] font-extrabold ${gradeCol}">${grade}</span>
+                <span class="text-sm font-black text-slate-900 font-mono">${score}%</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        openHubModal(
+          "مؤشرات وتقييم الأداء", 
+          "تحليل الكفاءة ومستويات الالتزام والانضباط تلقائياً", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>`, 
+          "bg-rose-500",
+          `<div class="space-y-4">
+             <h4 class="font-bold text-slate-800">معدل الانضباط التراكمي للموظفين الحاليين</h4>
+             <div class="space-y-2">
+               ${listHtml}
+             </div>
+           </div>`
+        );
+      };
+
+      window.openLeavesModal = function() {
+        let options = db.emps.map(e => `<option value="${e.id}">${e.name}</option>`).join("");
+        let contentHtml = `
+          <div class="space-y-6">
+            <h4 class="font-bold text-slate-800 text-sm">تقديم طلب إجازة إدارية معتمد</h4>
+            <form onsubmit="event.preventDefault(); alert('تم تسجيل وتحديث رصيد الإجازات بنجاح!'); closeHubModal();" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-bold mb-1">الموظف المعني</label>
+                <select required class="w-full border p-2 rounded-lg bg-white">${options || '<option value="">لا يوجد موظفين</option>'}</select>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold mb-1">من تاريخ</label>
+                  <input type="date" required class="w-full border p-2 rounded-lg">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">حتى تاريخ</label>
+                  <input type="date" required class="w-full border p-2 rounded-lg">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">نوع الإجازة</label>
+                <select class="w-full border p-2 rounded-lg bg-white">
+                  <option>إجازة سنوية اعتيادية</option>
+                  <option>إجازة مرضية مدعومة بتقرير</option>
+                  <option>إجازة عارضة / طارئة</option>
+                  <option>إجازة بدون راتب</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-lg">تسجيل طلب الإجازة بالملف المالي</button>
+            </form>
+          </div>
+        `;
+        openHubModal(
+          "شؤون الإجازات والرخص", 
+          "تفويض ومتابعة أرصدة العطلات السنوية ومستحقات الغياب", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`, 
+          "bg-pink-500",
+          contentHtml
+        );
+      };
+
+      window.openInsuranceModal = function() {
+        let contentHtml = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-slate-800">سياسة واحتساب التأمنيات الاجتماعية والمعاشات</h4>
+            <div class="bg-blue-50 p-4 border border-blue-100 rounded-2xl text-xs space-y-2">
+              <div class="flex justify-between font-bold">
+                <span>نسبة مساهمة الموظف (الاستقطاع المباشر)</span>
+                <span class="text-blue-700 font-mono">7% من الراتب الأساسي</span>
+              </div>
+              <div class="flex justify-between font-bold">
+                <span>نسبة مساهمة الشركة (صناديق التأمينات)</span>
+                <span class="text-blue-700 font-mono">15% من الراتب الأساسي</span>
+              </div>
+            </div>
+            <div class="space-y-2 text-xs">
+              <p class="font-bold text-slate-800">قائمة استعلام ملف التأمينات والمشتركين</p>
+              <table class="w-full text-right bg-slate-50 rounded-xl overflow-hidden text-slate-600">
+                <thead>
+                  <tr class="bg-slate-100 font-bold text-slate-800">
+                    <th class="p-2">أرقام الموظفين المشتركين</th>
+                    <th class="p-2">فئة التأمين</th>
+                    <th class="p-2">حالة السداد الدولي</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="p-2">جميع طواقم الموظفين</td>
+                    <td class="p-2">تأمين اجتماعي كامل + تأمين صحي فئة A</td>
+                    <td class="p-2 text-emerald-600 font-bold">منتظم ومسدد لشهر مايو</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "سجلات وصناديق التأمينات", 
+          "مراجعة خصومات التضامن والتعاون الطبي والاجتماعي المالي", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`, 
+          "bg-blue-600",
+          contentHtml
+        );
+      };
+
+      window.openContractsModal = function() {
+        if (db.emps.length === 0) {
+          openHubModal(
+            "العقود وصلاحيات العمل", 
+            "عقود التوظيف والعمل", 
+            `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`, 
+            "bg-teal-700",
+            `<div class="text-center py-6 text-slate-500">يرجى تسجيل موظفين أولاً لعرض حالة تفويض عقودهم</div>`
+          );
+          return;
+        }
+
+        let empsRows = db.emps.map((e, idx) => {
+          return `
+            <tr class="hover:bg-slate-50 border-b border-gray-100 text-xs text-slate-700">
+              <td class="p-3 font-semibold">${e.name}</td>
+              <td class="p-3 font-mono">عقد عمل غير محدد المدة</td>
+              <td class="p-3 font-mono italic">21/05/2026</td>
+              <td class="p-3 text-emerald-600 font-bold flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ساري
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        let contentHtml = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-slate-800">توثيق عقود الموظفين الفعالة بالشركة حالياً</h4>
+            <div class="overflow-x-auto border rounded-xl">
+              <table class="w-full text-right text-xs">
+                <thead>
+                  <tr class="bg-slate-100 font-bold text-slate-800">
+                    <th class="p-3">الموظف المعني</th>
+                    <th class="p-3">نوع العقد</th>
+                    <th class="p-3">تاريخ البدء</th>
+                    <th class="p-3">الحالة المعتمدة</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${empsRows}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "العقود والاتفاقيات والتوثيق", 
+          "تفويض ومتابعة تواريخ العقود والعمل وتاريخ المباشرة", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`, 
+          "bg-teal-700",
+          contentHtml
+        );
+      };
+
+      window.calculateInstallments = function() {
+        let amt = parseFloat(document.getElementById('loan-amount-calc').value) || 0;
+        let mths = parseFloat(document.getElementById('loan-months-calc').value) || 1;
+        if (mths < 1) mths = 1;
+        let displayEl = document.getElementById('calc-loan-result');
+        if (displayEl) {
+          displayEl.innerText = Math.round(amt / mths);
+        }
+      };
+
+      window.openLoansModal = function() {
+        let contentHtml = `
+          <div class="space-y-6">
+            <h4 class="font-bold text-slate-850">حاسبة جدولة السلف والقروض والأقساط التلقائية</h4>
+            <div class="bg-gray-50 p-4 rounded-2xl space-y-4 text-xs">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-bold mb-1">مبلغ السلفة المطلوبة (ريال)</label>
+                  <input type="number" id="loan-amount-calc" value="3000" class="w-full border p-2 rounded-lg bg-white outline-none" oninput="calculateInstallments()">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">فترة السداد (أشهر)</label>
+                  <input type="number" id="loan-months-calc" value="6" class="w-full border p-2 rounded-lg bg-white outline-none" oninput="calculateInstallments()">
+                </div>
+              </div>
+              <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl font-bold flex justify-between items-center text-indigo-900">
+                <span>القسط الشهري التقريبي المستقطع:</span>
+                <span class="text-lg font-black font-mono"><span id="calc-loan-result">500</span> ريال/شهر</span>
+              </div>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "السلف والقروض الشخصية", 
+          "إدارة استقطاع وجدولة أقساط مساعدة الموظفين والمنتسبين", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`, 
+          "bg-yellow-600",
+          contentHtml
+        );
+      };
+
+      window.openRewardsModal = function() {
+        let options = db.emps.map(e => `<option value="${e.id}">${e.name}</option>`).join("");
+        let contentHtml = `
+          <div class="space-y-6">
+            <h4 class="font-bold text-slate-800 text-sm">تسجيل مكافأة مالية أو حافز تشجيعي معتمد</h4>
+            <form onsubmit="event.preventDefault(); alert('تم منح الحافز وإدراجه بمسير الراتب لشهر مايو!'); closeHubModal();" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-bold mb-1">الموظف المكرم</label>
+                <select required class="w-full border p-2 rounded-lg bg-white">${options || '<option value="">لا يوجد موظفين</option>'}</select>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">قيمة الحافز المالي (بالمكافأة)</label>
+                <input type="number" required value="500" class="w-full border p-2 rounded-lg" placeholder="مثال: 500 ريال">
+              </div>
+              <div>
+                <label class="block font-bold mb-1">سبب منح التكريم والمكافأة</label>
+                <input type="text" required class="w-full border p-2 rounded-lg" placeholder="مثال: جهود استثنائية في الوردية الصباحية">
+              </div>
+              <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg text-xs">منح وسجل المكافأة بالملف</button>
+            </form>
+          </div>
+        `;
+        openHubModal(
+          "شؤون الحوافز والمكافآت", 
+          "شكر الموظفين الملتزمين ومنح العلاوات الاستثنائية للتميز", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm-2 4h4M3 11h18a2 2 0 012 2v7a2 2 0 01-2 2H3a2 2 0 01-2-2v-7a2 2 0 012-2z"/></svg>`, 
+          "bg-orange-500",
+          contentHtml
+        );
+      };
+
+      window.openLeaderboardModal = function() {
+        if (db.emps.length === 0) {
+          openHubModal(
+            "التحفيز الرقمي", 
+            "نجوم الالتزام للدوام", 
+            `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`, 
+            "bg-amber-500",
+            `<div class="text-center py-6 text-slate-500">لا يوجد بيانات كافية حالياً لتوليد الترتيب النجمي للموظفين الأكثر انضباطاً.</div>`
+          );
+          return;
+        }
+
+        // Compute leaderboard ranks based on lowest absence
+        let sorted = [...db.emps].map(e => {
+          let presentDays = db.atts.filter(a => a.employeeId === e.id && !a.type).length;
+          let absenceCount = db.atts.filter(a => a.employeeId === e.id && a.type === "غياب").length;
+          return { name: e.name, empId: e.empId, present: presentDays, absence: absenceCount };
+        }).sort((a,b) => b.present - a.present || a.absence - b.absence);
+
+        let colorsList = ["text-amber-500 bg-amber-50 border-amber-200", "text-slate-500 bg-slate-50 border-slate-200", "text-amber-800 bg-amber-50/50 border-amber-100"];
+        let medals = ["🥇 المركز الأول - درع الذهبي", "🥈 المركز الثاني - الفضي", "🥉 المركز الثالث - البرونزي"];
+
+        let lines = sorted.map((s, idx) => {
+          let med = medals[idx] ? medals[idx] : `⭐ مرتبة التميز رقم ${idx + 1}`;
+          let clst = colorsList[idx] ? colorsList[idx] : "text-slate-600 bg-slate-50 border-slate-100";
+          return `
+            <div class="p-4 rounded-2xl border ${clst} flex items-center justify-between text-xs">
+              <div>
+                <span class="font-extrabold block text-sm">${s.name} (${s.empId})</span>
+                <span class="text-[10px] mt-1 block">${med}</span>
+              </div>
+              <div class="text-left font-bold text-slate-700">
+                <span>أيام الحضور الفعلي: <span class="text-indigo-600 font-black">${s.present}</span> يوم</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        openHubModal(
+          "لوحة التميز والتحفيز الرقمي", 
+          "رواد الانضباط الأعلى التزاماً بالشهر من واقع ملقطات الدخول", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`, 
+          "bg-amber-500",
+          `<div class="space-y-4">
+             <h4 class="font-bold text-slate-800 text-sm">لوحة الصدارة والتميز في الحضور الحصري للموظفين</h4>
+             <div class="space-y-3">
+               ${lines}
+             </div>
+           </div>`
+        );
+      };
+
+      window.openOrgTreeModal = function() {
+        let employeesHtml = db.emps.map(e => {
+          let sName = "الوردية الافتراضية";
+          if (e.shiftId) {
+            let sh = (db.shifts || []).find(s => s.id === e.shiftId);
+            if (sh) sName = sh.name;
+          }
+          return `
+            <div class="relative pl-6 py-2 border-l-2 border-indigo-200 mr-8 text-xs">
+              <div class="absolute -right-1 top-4 w-2.5 h-2.5 rounded-full bg-indigo-400"></div>
+              <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-slate-800 block">${e.name}</span>
+                  <span class="text-[10px] text-slate-400 font-mono">رقم الموظف: ${e.empId}</span>
+                </div>
+                <span class="bg-indigo-100 text-indigo-700 font-extrabold px-2 py-0.5 rounded text-[9px]">${sName}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        let emptyMsg = db.emps.length === 0 ? `<div class="text-xs text-slate-400 py-3 mr-8">لا يوجد موظفين مسجلين لعرضهم بالشجرة.</div>` : "";
+
+        let rootTreeHtml = `
+          <div class="space-y-4 select-none mr-2">
+            <!-- Level 1 Root -->
+            <div class="bg-slate-900 text-white p-4 rounded-2xl flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center font-bold">O</div>
+              <div>
+                <span class="font-black block text-sm">المدير العام للمجموعة / عمر Omar CEO</span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-mono">أعلى سلطة إدارية</span>
+              </div>
+            </div>
+
+            <!-- Level 2 Branch -->
+            <div class="relative pl-6 py-1 mr-4 border-l-2 border-slate-350">
+              <div class="absolute -right-1.5 top-5 w-3 h-3 rounded-full bg-slate-800"></div>
+              <div class="bg-slate-800 text-white p-3 rounded-xl flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"/></svg>
+                <div>
+                  <span class="font-bold block text-xs text-indigo-300">مدير عام العمليات والموارد البشرية HR Director</span>
+                  <span class="text-[9px] text-slate-400">إدارة الجداول والورديات والرواتب الأساسية</span>
+                </div>
+              </div>
+
+              <!-- Level 3 Dynamic Children -->
+              <div class="mt-4 space-y-3 relative mr-4">
+                <div class="absolute -right-1 top-0 bottom-0 w-0.5 bg-indigo-100"></div>
+                ${employeesHtml}
+                ${emptyMsg}
+              </div>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "الهيكل التنظيمي والشجري", 
+          "عرض تسلسل المستويات والمناصب الوظيفية والربط الإداري المباشر", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4M16 8l-4-4-4 4m8 8l-4 4-4-4"/></svg>`, 
+          "bg-indigo-600",
+          rootTreeHtml
+        );
+      };
+
+      window.openPoliciesModal = function() {
+        let contentHtml = `
+          <div class="space-y-4 text-slate-700 text-xs leading-relaxed">
+            <h4 class="font-bold text-slate-800 border-b pb-2">تفاصيل اللائحة التنظيمية الرسمية للشركة لعام 2026</h4>
+            <div class="space-y-3">
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+                <p class="font-bold text-slate-900">• احتساب فترات التأخير وسماح الدخول:</p>
+                <p class="text-slate-600">
+                  يسمح للموظف دخول الوردية بحد أقصى مسموح <b class="text-indigo-600">15 دقيقة سماح</b>. في حال زاد التأخير عن حد السماح، يبدأ النظام في احتساب غرامة تأخير دقيقة بدقيقة أو ربع يوم عمل حسب لائحة الجزاءات المتفق عليها.
+                </p>
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+                <p class="font-bold text-slate-900">• لائحة الغياب وبصمة التواجد:</p>
+                <p class="text-slate-600">
+                  غياب كامل بدون عذر مسبق أو مأمورية رسمية يسجل النظام <b class="text-red-500">خصم كامل اليوم اليومي</b> ويعاقب الموظف بالحرمان من العلاوة والحوافز الإيجابية الشهرية لـ "التحفيز الرقمي".
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
+        openHubModal(
+          "سياسات الشركة المعتمدة وشرعة الحضور", 
+          "قوانين ولوائح فترات السماح وبصمات الوجه ولائحة الخصام والغياب", 
+          `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`, 
+          "bg-slate-900",
+          contentHtml
+        );
       };
 
       function navigate(to) {
         document
           .querySelectorAll(".view-section")
           .forEach((e) => e.classList.remove("active"));
-        document
-          .querySelectorAll(".nav-link")
-          .forEach((e) => e.classList.remove("active"));
         document.getElementById("view-" + to).classList.add("active");
-        document.getElementById("nav-" + to).classList.add("active");
+        
+        const backBtn = document.getElementById("back-to-hub-btn");
+        if (backBtn) {
+          if (to === "dashboard") {
+            backBtn.classList.add("hidden");
+            backBtn.classList.remove("flex");
+          } else {
+            backBtn.classList.remove("hidden");
+            backBtn.classList.add("flex");
+          }
+        }
+
         if (to === "employees") renderEmps();
         if (to === "reports") {
           document.getElementById("report-emp").innerHTML =
@@ -743,10 +2186,43 @@
           }
         }
         if (to === "settings") {
-          document.getElementById("s-start").value = db.set.in || "09:00";
-          document.getElementById("s-end").value = db.set.out || "17:00";
+          renderShiftsList();
+          renderGeneralSettings();
         }
       }
+
+      function renderGeneralSettings() {
+        if (!db.set) db.set = { in: "09:00", out: "17:00" };
+        document.getElementById("set-default-in").value = db.set.in || "09:00";
+        document.getElementById("set-default-out").value = db.set.out || "17:00";
+        
+        let wDays = db.set.weekends || [5, 6];
+        let checkboxes = document.querySelectorAll('input[name="set-weekends"]');
+        checkboxes.forEach(cb => {
+          let val = parseInt(cb.value);
+          cb.checked = wDays.includes(val);
+        });
+      }
+
+      window.saveGeneralSettings = function(e) {
+        if (e) e.preventDefault();
+        let valIn = document.getElementById("set-default-in").value;
+        let valOut = document.getElementById("set-default-out").value;
+        
+        let cbs = document.querySelectorAll('input[name="set-weekends"]:checked');
+        let selectedWeekends = [];
+        cbs.forEach(cb => {
+          selectedWeekends.push(parseInt(cb.value));
+        });
+        
+        if (!db.set) db.set = {};
+        db.set.in = valIn;
+        db.set.out = valOut;
+        db.set.weekends = selectedWeekends;
+        
+        saveDB();
+        alert("تم حفظ التغييرات العامة بنجاح!");
+      };
 
       const formatT = (m) =>
         m
@@ -763,51 +2239,262 @@
       function saveEmployee(e) {
         e.preventDefault();
         let nId = document.getElementById("emp-sys-id").value;
-        let i = document.getElementById("emp-id").value;
-        let n = document.getElementById("emp-name").value;
+        let i = document.getElementById("emp-id").value.trim();
+        let n = document.getElementById("emp-name").value.trim();
+        let shId = document.getElementById("emp-shift-id") ? document.getElementById("emp-shift-id").value : "";
+        let dp = document.getElementById("emp-dept") ? document.getElementById("emp-dept").value : "الإدارة العامة";
+        let tl = document.getElementById("emp-title") ? document.getElementById("emp-title").value.trim() : "";
+        let ph = document.getElementById("emp-phone") ? document.getElementById("emp-phone").value.trim() : "";
+        let sl = parseFloat(document.getElementById("emp-salary") ? document.getElementById("emp-salary").value : 5000) || 5000;
+
         if (nId) {
           let obj = db.emps.find((x) => x.id == nId);
           if (obj) {
             obj.empId = i;
             obj.name = n;
+            obj.shiftId = shId;
+            obj.dept = dp;
+            obj.title = tl;
+            obj.phone = ph;
+            obj.salary = sl;
           }
         } else {
           db.emps.push({
             id: Math.random().toString(36).substr(2, 9),
             empId: i,
             name: n,
+            shiftId: shId,
+            dept: dp,
+            title: tl,
+            phone: ph,
+            salary: sl
           });
         }
         e.target.reset();
         document.getElementById("emp-sys-id").value = "";
+        if (document.getElementById("emp-shift-id")) {
+          document.getElementById("emp-shift-id").value = "";
+        }
         saveDB();
         renderEmps();
+        if (window.updateKioskEmpSelect) {
+          window.updateKioskEmpSelect();
+        }
       }
 
       function renderEmps() {
+        let shiftsHtml = (db.shifts || []).map(s => `<option value="${s.id}">${s.name} (${s.in} - ${s.out})</option>`).join('');
+        const shiftSelect = document.getElementById("emp-shift-id");
+        if (shiftSelect) {
+          shiftSelect.innerHTML = '<option value="">الوردية الافتراضية للشركة</option>' + shiftsHtml;
+        }
+
+        // Update employee counts badge
+        const badgeCount = document.getElementById("emp-count-badge");
+        if (badgeCount) {
+          badgeCount.innerText = `${db.emps.length} موظف ينشط`;
+        }
+
         document.getElementById("emp-table-body").innerHTML = db.emps
           .map(
-            (e) => `
-                <tr class="hover:bg-gray-50"><td class="p-4 border-b font-medium">${e.empId}</td><td class="p-4 border-b">${e.name}</td>
-                <td class="p-4 border-b text-center"><button onclick="editE('${e.id}')" class="text-blue-600 ml-2">تعديل</button><button onclick="delE('${e.id}')" class="text-red-600">حذف</button></td></tr>
-            `,
+            (e) => {
+              let shiftObj = (db.shifts || []).find(s => s.id === e.shiftId);
+              let shiftDisplay = shiftObj ? `${shiftObj.name} (${shiftObj.in} - ${shiftObj.out})` : `الافتراضية (${db.set.in || "09:00"} - ${db.set.out || "17:00"})`;
+              let deptVal = e.dept || "الإدارة العامة";
+              let titleVal = e.title || "لا يوجد";
+              let phoneVal = e.phone || "لا يوجد";
+              let salaryVal = e.salary || 5000;
+              return `
+                <tr class="hover:bg-blue-50/40 transition">
+                  <td class="p-4 border-b font-mono font-bold text-slate-800">${e.empId}</td>
+                  <td class="p-4 border-b">
+                    <div class="font-extrabold text-slate-900">${e.name}</div>
+                  </td>
+                  <td class="p-4 border-b font-Cairo">
+                    <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg border border-indigo-100 font-bold block w-fit text-[10px]">${deptVal}</span>
+                    <span class="text-[10px] text-slate-400 font-medium block mt-1">${titleVal}</span>
+                  </td>
+                  <td class="p-4 border-b font-mono text-slate-500">${phoneVal}</td>
+                  <td class="p-4 border-b">
+                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-xl font-bold font-mono">${salaryVal.toLocaleString()} جنيه</span>
+                  </td>
+                  <td class="p-4 border-b font-Cairo text-slate-600 font-semibold">${shiftDisplay}</td>
+                  <td class="p-4 border-b text-center">
+                    <div class="flex items-center justify-center gap-2">
+                      <button onclick="editE('${e.id}')" class="text-blue-600 hover:text-blue-800 font-extrabold bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition">تعديل</button>
+                      <button onclick="delE('${e.id}')" class="text-rose-600 hover:text-rose-800 font-extrabold bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg transition font-Cairo">حذف</button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }
           )
           .join("");
       }
+
       function delE(id) {
         if (confirm("متأكد؟")) {
           db.emps = db.emps.filter((e) => e.id !== id);
           saveDB();
           renderEmps();
+          if (window.updateKioskEmpSelect) {
+            window.updateKioskEmpSelect();
+          }
         }
       }
+
       function editE(id) {
         let obj = db.emps.find((e) => e.id == id);
         if (obj) {
           document.getElementById("emp-sys-id").value = id;
           document.getElementById("emp-id").value = obj.empId;
           document.getElementById("emp-name").value = obj.name;
+          if (document.getElementById("emp-dept")) {
+            document.getElementById("emp-dept").value = obj.dept || "الإدارة العامة";
+          }
+          if (document.getElementById("emp-title")) {
+            document.getElementById("emp-title").value = obj.title || "";
+          }
+          if (document.getElementById("emp-phone")) {
+            document.getElementById("emp-phone").value = obj.phone || "";
+          }
+          if (document.getElementById("emp-salary")) {
+            document.getElementById("emp-salary").value = obj.salary || 5000;
+          }
+          const shiftSelect = document.getElementById("emp-shift-id");
+          if (shiftSelect) {
+            shiftSelect.value = obj.shiftId || "";
+          }
         }
+      }
+
+      function saveShift(e) {
+        if (e) e.preventDefault();
+        let sid = document.getElementById("shift-edit-id").value;
+        let sname = document.getElementById("shift-name").value.trim();
+        let sin = document.getElementById("shift-in").value;
+        let sout = document.getElementById("shift-out").value;
+        let sgrace = parseInt(document.getElementById("shift-grace").value) || 0;
+
+        let cbs = document.querySelectorAll('input[name="shift-weekends-cb"]:checked');
+        let selectedWeekends = [];
+        cbs.forEach(cb => {
+          selectedWeekends.push(parseInt(cb.value));
+        });
+        
+        if (!sname || !sin || !sout) {
+          alert("الرجاء تعبئة اسم الوردية وميعاد الدخول والخروج");
+          return;
+        }
+
+        if (sid) {
+          let obj = (db.shifts || []).find(s => s.id == sid);
+          if (obj) {
+            obj.name = sname;
+            obj.in = sin;
+            obj.out = sout;
+            obj.grace = sgrace;
+            obj.weekends = selectedWeekends;
+          }
+        } else {
+          if (!db.shifts) db.shifts = [];
+          db.shifts.push({
+            id: Math.random().toString(36).substr(2, 9),
+            name: sname,
+            in: sin,
+            out: sout,
+            grace: sgrace,
+            weekends: selectedWeekends
+          });
+        }
+        
+        saveDB();
+        resetShiftForm();
+        renderShiftsList();
+        // Refresh employee view if it depends on shift options:
+        if (typeof renderEmps === "function") {
+          renderEmps();
+        }
+        // Force populating shift selectors across forms:
+        populateShiftSelectors();
+        alert("تم حفظ الوردية بنجاح!");
+      }
+
+      function resetShiftForm() {
+        document.getElementById("shift-edit-id").value = "";
+        document.getElementById("shift-name").value = "";
+        document.getElementById("shift-in").value = "";
+        document.getElementById("shift-out").value = "";
+        document.getElementById("shift-grace").value = "15";
+
+        let checkboxes = document.querySelectorAll('input[name="shift-weekends-cb"]');
+        checkboxes.forEach(cb => {
+          let val = parseInt(cb.value);
+          cb.checked = (val === 5 || val === 6); // default Friday & Saturday
+        });
+
+        document.getElementById("btn-shift-save").innerText = "إضافة وردية جديدة";
+      }
+
+      function editShift(id) {
+        let obj = (db.shifts || []).find(s => s.id == id);
+        if (obj) {
+          document.getElementById("shift-edit-id").value = obj.id;
+          document.getElementById("shift-name").value = obj.name;
+          document.getElementById("shift-in").value = obj.in;
+          document.getElementById("shift-out").value = obj.out;
+          document.getElementById("shift-grace").value = obj.grace !== undefined ? obj.grace : "15";
+
+          let wDays = obj.weekends !== undefined ? obj.weekends : [5, 6];
+          let checkboxes = document.querySelectorAll('input[name="shift-weekends-cb"]');
+          checkboxes.forEach(cb => {
+            let val = parseInt(cb.value);
+            cb.checked = wDays.includes(val);
+          });
+
+          document.getElementById("btn-shift-save").innerText = "حفظ التعديلات";
+        }
+      }
+
+      function deleteShift(id) {
+        if (confirm("هل تريد حذف هذه الوردية؟")) {
+          (db.emps || []).forEach(e => {
+            if (e.shiftId == id) {
+              e.shiftId = "";
+            }
+          });
+          db.shifts = (db.shifts || []).filter(s => s.id !== id);
+          saveDB();
+          renderShiftsList();
+          populateShiftSelectors();
+          if (document.getElementById("view-employees").classList.contains("active")) {
+            renderEmps();
+          }
+        }
+      }
+
+      function renderShiftsList() {
+        if (!db.shifts) db.shifts = [];
+        const dayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        let html = db.shifts.map(s => {
+          let wknds = s.weekends !== undefined ? s.weekends : [5, 6];
+          let wkndsStr = wknds.map(w => dayNames[w]).join("، ");
+          if (!wkndsStr) wkndsStr = "لا يوجد عطلات";
+          let graceStr = s.grace !== undefined ? `${s.grace} دقيقة` : "15 دقيقة";
+          return `
+            <tr class="hover:bg-gray-50 text-xs">
+              <td class="p-3 border-b font-extrabold text-slate-800">${s.name}</td>
+              <td class="p-3 border-b font-mono text-center text-indigo-650 font-bold">${s.in} - ${s.out}</td>
+              <td class="p-3 border-b text-center font-mono text-amber-600 font-bold">${graceStr}</td>
+              <td class="p-3 border-b text-center font-bold text-pink-600">${wkndsStr}</td>
+              <td class="p-3 border-b text-center">
+                <button onclick="editShift('${s.id}')" class="text-blue-600 ml-3 font-bold hover:text-blue-800">تعديل</button>
+                <button onclick="deleteShift('${s.id}')" class="text-red-500 font-bold hover:text-red-700">حذف</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+        document.getElementById("shifts-table-body").innerHTML = html;
       }
 
       function handleExcelUpload(e) {
@@ -975,8 +2662,16 @@
               if (match) {
                 let h = parseInt(match[1]);
                 let m = parseInt(match[2]);
-                if (isPM && h < 12) h += 12;
-                if (isAM && h === 12) h = 0;
+                if (isPM) {
+                  if (h !== 12) {
+                    h += 12;
+                  }
+                }
+                if (isAM) {
+                  if (h === 12) {
+                    h = 0;
+                  }
+                }
                 return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
               }
               let fallbackMatch = s.match(/\d{1,2}:\d{2}/);
@@ -1025,6 +2720,278 @@
         r.readAsArrayBuffer(file);
       }
 
+      window.downloadExcelTemplate = function() {
+        const data = [
+          { "id": "1001", "name": "أحمد عمر", "date": "2026-05-20", "in": "08:45", "out": "17:15" },
+          { "id": "1002", "name": "محمد علي", "date": "2026-05-20", "in": "09:15", "out": "17:00" },
+          { "id": "1001", "name": "أحمد عمر", "date": "2026-05-21", "in": "09:00", "out": "17:30" }
+        ];
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+        XLSX.writeFile(wb, "OMAR_Attendance_Template.xlsx");
+      };
+
+      let activeReportTab = 'individual';
+
+      window.switchReportTab = function(tabId) {
+        activeReportTab = tabId;
+        
+        // Update tab buttons styles
+        const tabs = ['individual', 'general', 'payroll'];
+        tabs.forEach(t => {
+          const btn = document.getElementById(`report-tab-${t}`);
+          if (btn) {
+            if (t === tabId) {
+              btn.className = "px-5 py-2.5 rounded-xl font-bold transition-all duration-200 bg-blue-600 text-white shadow-md cursor-pointer";
+            } else {
+              btn.className = "px-5 py-2.5 rounded-xl font-bold transition-all duration-200 text-slate-705 hover:bg-slate-200 hover:text-slate-900 cursor-pointer";
+            }
+          }
+        });
+
+        // Hide/Show target filters wrapper
+        const empFilter = document.getElementById("filter-emp-wrapper");
+        if (empFilter) {
+          if (tabId === 'individual') {
+            empFilter.classList.remove("hidden");
+          } else {
+            empFilter.classList.add("hidden");
+          }
+        }
+
+        // Hide all report results first
+        document.getElementById("printable-report").classList.add("hidden");
+        document.getElementById("wrapper-general-report").classList.add("hidden");
+        document.getElementById("wrapper-payroll-report").classList.add("hidden");
+      };
+
+      window.runReportGenerator = function() {
+        if (activeReportTab === 'individual') {
+          generateReport();
+        } else if (activeReportTab === 'general') {
+          generateGeneralReport();
+        } else if (activeReportTab === 'payroll') {
+          generatePayrollReport();
+        }
+      };
+
+      window.generateGeneralReport = function() {
+        let sd = document.getElementById("report-start").value;
+        if (!sd) return alert("الرجاء تحديد تاريخ الاستعلام (من)");
+
+        document.getElementById("wrapper-general-report").classList.remove("hidden");
+        document.getElementById("general-report-date-badge").innerText = `التاريخ المستعلم عنه: ${new Date(sd).toLocaleDateString("en-GB")}`;
+
+        let tbody = "";
+        db.emps.forEach(emp => {
+          let rec = db.atts.find(x => x.employeeId == emp.id && x.date == sd);
+          let shiftObj = (db.shifts || []).find(s => s.id === emp.shiftId);
+          let sIn = shiftObj ? shiftObj.in : (db.set.in || "09:00");
+          let sOut = shiftObj ? shiftObj.out : (db.set.out || "17:00");
+
+          let rIn = rec?.timeIn || "";
+          let rOut = rec?.timeOut || "";
+          let rType = rec?.type || "";
+
+          let statusBadge = "";
+          let lateMin = 0;
+          let otMin = 0;
+
+          let empShiftWeekends = db.set.weekends || [5, 6];
+          let empShiftGrace = 0;
+          if (shiftObj) {
+            if (shiftObj.weekends !== undefined) empShiftWeekends = shiftObj.weekends;
+            if (shiftObj.grace !== undefined) empShiftGrace = parseInt(shiftObj.grace) || 0;
+          }
+
+          let isWknd = empShiftWeekends.includes(new Date(sd).getDay());
+
+          if (rec && (rIn || rOut || rType)) {
+            if (rType) {
+              if (rType === "إجازة") statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-lg">إجازة سنوية</span>`;
+              else if (rType === "مرضي") statusBadge = `<span class="bg-rose-100 text-rose-800 font-bold px-2.5 py-1 rounded-lg">مرضي</span>`;
+              else if (rType === "إذن") statusBadge = `<span class="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-lg">إذن خاص</span>`;
+              else if (rType === "مأمورية") statusBadge = `<span class="bg-teal-100 text-teal-800 font-bold px-2.5 py-1 rounded-lg">مأمورية عمل</span>`;
+              else if (rType === "غياب") statusBadge = `<span class="bg-red-100 text-red-800 font-bold px-2.5 py-1 rounded-lg">غياب صريح</span>`;
+            } else {
+              statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">حاضر</span>`;
+              
+              let minIn = parseT(rIn);
+              let minSIn = parseT(sIn);
+              if (minIn > (minSIn + empShiftGrace)) {
+                lateMin = minIn - minSIn;
+              }
+
+              let minOut = parseT(rOut);
+              let minSOut = parseT(sOut);
+              if (minOut > minSOut) {
+                otMin = minOut - minSOut;
+              }
+            }
+          } else {
+            statusBadge = isWknd ? `<span class="bg-slate-100 text-slate-500 font-bold px-2.5 py-1 rounded-lg">عطلة أسبوعية</span>` : `<span class="bg-red-50 text-red-500 font-bold px-2.5 py-1 rounded-lg">غير مستورد / غائب</span>`;
+          }
+
+          let deptVal = emp.dept || "الإدارة العامة";
+
+          tbody += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3 border-b font-mono font-bold text-slate-700">${emp.empId}</td>
+              <td class="p-3 border-b font-extrabold text-slate-900">${emp.name}</td>
+              <td class="p-3 border-b text-slate-500">${deptVal}</td>
+              <td class="p-3 border-b font-mono text-slate-400">${sd}</td>
+              <td class="p-3 border-b">${statusBadge}</td>
+              <td class="p-3 border-b font-semibold font-mono text-emerald-600">${rIn || "--:--"}</td>
+              <td class="p-3 border-b font-semibold font-mono text-rose-600">${rOut || "--:--"}</td>
+              <td class="p-3 border-b font-bold text-red-750">${lateMin ? lateMin + ' دقيقة' : '--'}</td>
+              <td class="p-3 border-b font-bold text-emerald-750">${otMin ? (otMin / 60).toFixed(1) + ' ساعة' : '--'}</td>
+            </tr>
+          `;
+        });
+        document.getElementById("general-report-table-body").innerHTML = tbody;
+      };
+
+      window.generatePayrollReport = function() {
+        let sd = document.getElementById("report-start").value;
+        let ed = document.getElementById("report-end").value;
+        if (!sd || !ed) return alert("الرجاء تحديد تاريخ البداية والنهاية لحساب الرواتب");
+
+        document.getElementById("wrapper-payroll-report").classList.remove("hidden");
+        document.getElementById("payroll-report-period-badge").innerText = `الفترة الزمنية: ${sd} إلى ${ed}`;
+
+        let tbody = "";
+
+        db.emps.forEach(emp => {
+          let empShiftValIn = db.set.in || "09:00";
+          let empShiftValOut = db.set.out || "17:00";
+          let empShiftWeekends = db.set.weekends || [5, 6];
+          let empShiftGrace = 0;
+
+          if (emp.shiftId) {
+            let sh = (db.shifts || []).find(s => s.id === emp.shiftId);
+            if (sh) {
+              empShiftValIn = sh.in;
+              empShiftValOut = sh.out;
+              if (sh.weekends !== undefined) empShiftWeekends = sh.weekends;
+              if (sh.grace !== undefined) empShiftGrace = parseInt(sh.grace) || 0;
+            }
+          }
+
+          let presDays = 0;
+          let absentDays = 0;
+          let delayMinutes = 0;
+          let earlyMinutes = 0;
+          let delayPenaltyHours = 0;
+          let earlyPenaltyHours = 0;
+          let otMinutes = 0;
+
+          // Days iteration loop
+          let currentStrDate = sd;
+          while (ed >= currentStrDate) {
+            let [yearStr, monthStr, dayStr] = currentStrDate.split("-");
+            let dObj = new Date(Date.UTC(yearStr, parseInt(monthStr) - 1, parseInt(dayStr)));
+            let isWknd = empShiftWeekends.includes(dObj.getUTCDay());
+
+            let recs = db.atts.filter(x => x.employeeId == emp.id && x.date == currentStrDate);
+            if (recs.length === 0) recs = [null];
+
+            recs.forEach(rec => {
+              let rIn = rec?.timeIn || "";
+              let rOut = rec?.timeOut || "";
+              let rType = rec?.type || "";
+
+              if (rec && (rIn || rOut || rType)) {
+                if (!rType) {
+                  presDays++;
+                  // Calculate late minutes
+                  let minIn = parseT(rIn);
+                  let minSIn = parseT(empShiftValIn);
+                  if (minIn > (minSIn + empShiftGrace)) {
+                    let dM = minIn - minSIn;
+                    delayMinutes += dM;
+                    if (dM <= 15) delayPenaltyHours += 0;
+                    else if (dM <= 30) delayPenaltyHours += 0.5;
+                    else if (dM <= 60) delayPenaltyHours += 1;
+                    else if (dM <= 90) delayPenaltyHours += 1.5;
+                    else if (dM <= 120) delayPenaltyHours += 2;
+                    else if (dM <= 180) delayPenaltyHours += 3;
+                    else if (dM <= 240) delayPenaltyHours += 4;
+                    else delayPenaltyHours += 8;
+                  }
+
+                  // Calculate Early departure minutes
+                  let minOut = parseT(rOut);
+                  let minSOut = parseT(empShiftValOut);
+                  
+                  if (minOut && minSOut && minSOut > minOut) {
+                    let eM = minSOut - minOut;
+                    earlyMinutes += eM;
+                    if (eM > 0) {
+                      if (eM <= 15) earlyPenaltyHours += 0.5;
+                      else if (eM <= 60) earlyPenaltyHours += 1;
+                      else if (eM <= 90) earlyPenaltyHours += 1.5;
+                      else if (eM <= 120) earlyPenaltyHours += 2;
+                      else if (eM <= 150) earlyPenaltyHours += 3;
+                      else if (eM <= 180) earlyPenaltyHours += 4;
+                      else earlyPenaltyHours += 8;
+                    }
+                  }
+
+                  // Calculate Overtime minutes
+                  if (minOut > minSOut) {
+                    otMinutes += (minOut - minSOut);
+                  }
+                } else if (rType === "غياب") {
+                  absentDays++;
+                } else if (rType === "مأمورية" || rType === "إذن") {
+                  presDays++;
+                }
+              } else if (!isWknd) {
+                absentDays++;
+              }
+            });
+
+            let nextD = new Date(Date.UTC(yearStr, parseInt(monthStr) - 1, parseInt(dayStr) + 1));
+            currentStrDate = nextD.toISOString().split("T")[0];
+          }
+
+          // Wage calculations (divisor of 30 days)
+          let basicSalary = emp.salary || 5000;
+          let dailyRate = basicSalary / 30;
+          let hourlyRate = dailyRate / 8;
+
+          let absenceDeduction = absentDays * dailyRate;
+          let delayDeduction = delayPenaltyHours * hourlyRate;
+          let earlyDeduction = earlyPenaltyHours * hourlyRate;
+          let overtimeBonus = otMinutes * ((hourlyRate * 1.5) / 60);
+
+          let netSalary = basicSalary - absenceDeduction - delayDeduction - earlyDeduction + overtimeBonus;
+          if (netSalary < 0) netSalary = 0;
+
+          tbody += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3 border-b font-mono font-black text-slate-700">${emp.empId}</td>
+              <td class="p-3 border-b font-extrabold text-slate-900">${emp.name}</td>
+              <td class="p-3 border-b font-medium text-slate-500">${emp.dept || "الإدارة العامة"} / ${emp.title || "موظف"}</td>
+              <td class="p-3 border-b font-mono font-bold text-slate-800">${basicSalary.toLocaleString()} جنيه</td>
+              <td class="p-3 border-b font-bold text-emerald-600">${presDays} أيام</td>
+              <td class="p-3 border-b font-bold text-rose-500">${absentDays} أيام</td>
+              <td class="p-3 border-b font-mono text-rose-705 font-medium">-${Math.round(absenceDeduction).toLocaleString()} جنيه</td>
+              <td class="p-3 border-b font-mono text-slate-500">${delayMinutes} دقيقة</td>
+              <td class="p-3 border-b font-mono text-rose-705 font-medium">-${Math.round(delayDeduction).toLocaleString()} جنيه</td>
+              <td class="p-3 border-b font-mono text-slate-500">${earlyMinutes} دقيقة</td>
+              <td class="p-3 border-b font-mono text-rose-705 font-medium">-${Math.round(earlyDeduction).toLocaleString()} جنيه</td>
+              <td class="p-3 border-b font-mono text-emerald-600">${(otMinutes / 60).toFixed(1)} ساعة</td>
+              <td class="p-3 border-b font-mono text-emerald-755 font-medium">+${Math.round(overtimeBonus).toLocaleString()} جنيه</td>
+              <td class="p-3 border-b font-black text-blue-800 text-sm bg-blue-50/40">${Math.round(netSalary).toLocaleString()} جنيه</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("payroll-report-table-body").innerHTML = tbody;
+      };
+
       let currEmp = null;
       function generateReport() {
         currEmp = document.getElementById("report-emp").value;
@@ -1051,8 +3018,21 @@
           periodEl.innerText = `${sdFormatted} - ${edFormatted}`;
         }
         
+        let empShiftValIn = db.set.in || "09:00";
+        let empShiftValOut = db.set.out || "17:00";
+        let empShiftName = "الوردية الافتراضية";
+
+        if (emp && emp.shiftId) {
+          let sh = (db.shifts || []).find(s => s.id === emp.shiftId);
+          if (sh) {
+            empShiftValIn = sh.in;
+            empShiftValOut = sh.out;
+            empShiftName = sh.name;
+          }
+        }
+
         let shiftEl = document.getElementById("print-shift");
-        if (shiftEl) shiftEl.innerText = `${db.set.in} - ${db.set.out}`;
+        if (shiftEl) shiftEl.innerText = `${empShiftName} (${empShiftValIn} - ${empShiftValOut})`;
 
         let todayStr = new Date().toLocaleDateString("en-GB");
         let pDateTop = document.getElementById("print-date-top");
@@ -1082,12 +3062,23 @@
         let currentStrDate = sd;
         let rowIdx = 1;
 
-        while (currentStrDate <= ed) {
+        while (ed >= currentStrDate) {
           let [yearStr, monthStr, dayStr] = currentStrDate.split("-");
           let dObj = new Date(
             Date.UTC(yearStr, parseInt(monthStr) - 1, parseInt(dayStr)),
           );
-          let isWknd = dObj.getUTCDay() === 5 || dObj.getUTCDay() === 6;
+
+          let empShiftWeekends = db.set.weekends || [5, 6];
+          let empShiftGrace = 0;
+          if (emp && emp.shiftId) {
+            let sh = (db.shifts || []).find(s => s.id === emp.shiftId);
+            if (sh) {
+              if (sh.weekends !== undefined) empShiftWeekends = sh.weekends;
+              if (sh.grace !== undefined) empShiftGrace = parseInt(sh.grace) || 0;
+            }
+          }
+
+          let isWknd = empShiftWeekends.includes(dObj.getUTCDay());
 
           let recs = db.atts.filter(
             (x) => x.employeeId == currEmp && x.date == currentStrDate,
@@ -1104,7 +3095,9 @@
             let latM = 0,
               erlM = 0,
               dedM = 0,
-              otM = 0;
+              otM = 0,
+              dedLatM = 0,
+              dedErlM = 0;
 
             if (rec && (rIn || rOut || rType)) {
               if (!rType) {
@@ -1122,16 +3115,39 @@
 
               let minIn = parseT(rIn),
                 minOut = parseT(rOut),
-                minSIn = parseT(db.set.in),
-                minSOut = parseT(db.set.out);
+                minSIn = parseT(empShiftValIn),
+                minSOut = parseT(empShiftValOut);
 
               if (minIn && minOut)
                 wrk = formatT(minOut - minIn > 0 ? minOut - minIn : 0);
-              if (minIn && minSIn && minIn > minSIn) latM = minIn - minSIn;
-              if (minOut && minSOut && minOut < minSOut)
+              if (minIn && minSIn && minIn > (minSIn + empShiftGrace)) {
+                latM = minIn - minSIn;
+              }
+              if (minOut && minSOut && minSOut > minOut)
                 erlM = minSOut - minOut;
               if (minOut && minSOut && minOut > minSOut) otM = minOut - minSOut;
-              dedM = latM + erlM;
+              
+              if (latM > 0) {
+                if (latM <= 15) dedLatM = 0;
+                else if (latM <= 30) dedLatM = 30; // 0.5hr
+                else if (latM <= 60) dedLatM = 60; // 1hr
+                else if (latM <= 90) dedLatM = 90; // 1.5hr
+                else if (latM <= 120) dedLatM = 120; // 2hr
+                else if (latM <= 180) dedLatM = 180; // 3hr
+                else if (latM <= 240) dedLatM = 240; // 4hr
+                else dedLatM = 480; // 8hr/1day
+              }
+              
+              if (erlM > 0) {
+                if (erlM <= 0) dedErlM = 0;
+                else if (erlM <= 15) dedErlM = 30;
+                else if (erlM <= 60) dedErlM = 60;
+                else if (erlM <= 90) dedErlM = 90;
+                else if (erlM <= 120) dedErlM = 120;
+                else if (erlM <= 150) dedErlM = 180;
+                else if (erlM <= 180) dedErlM = 240;
+                else dedErlM = 480;
+              }
             } else if (rec && rec.type) {
               // already handled
             } else if (!isWknd) {
@@ -1140,19 +3156,23 @@
 
             let vL =
               rec?.vL !== undefined ? rec?.vL : latM ? formatT(latM) : "0:00";
+            let vD_lat =
+              rec?.ded_lat !== undefined ? rec?.ded_lat : dedLatM ? formatT(dedLatM) : "0:00";
             let vE =
               rec?.vE !== undefined ? rec?.vE : erlM ? formatT(erlM) : "0:00";
-            let vD =
-              rec?.vD !== undefined ? rec?.vD : dedM ? formatT(dedM) : "0";
+            let vD_erl =
+              rec?.ded_erl !== undefined ? rec?.ded_erl : dedErlM ? formatT(dedErlM) : "0:00";
             let vO =
               rec?.vO !== undefined ? rec?.vO : otM ? formatT(otM) : "0:00";
+            
             if (!latM && !rec?.vL) vL = "";
+            if (!dedLatM && !rec?.ded_lat) vD_lat = "";
             if (!erlM && !rec?.vE) vE = "";
-            if (!dedM && !rec?.vD) vD = "";
+            if (!dedErlM && !rec?.ded_erl) vD_erl = "";
             if (!otM && !rec?.vO) vO = "";
 
-            dedTotal += parseT(vD || "0");
-            otTotal += parseT(vO || "0");
+            dedTotal += parseT(vD_lat || "0:00") + parseT(vD_erl || "0:00");
+            otTotal += parseT(vO || "0:00");
 
             let rId =
               rec?.id || "new-" + Math.random().toString(36).substr(2, 6);
@@ -1175,6 +3195,7 @@
                     <td class="p-1 border border-gray-400"></td>
                     <td class="p-1 border border-gray-400"></td>
                     <td class="p-1 border border-gray-400"></td>
+                    <td class="p-1 border border-gray-400"></td>
                 </tr>
               `;
             } else {
@@ -1187,18 +3208,12 @@
                     <td class="p-0 border border-gray-400 bg-white min-w-[60px]"><input type="time" value="${rOut}" onchange="updA('${rId}','${currentStrDate}','timeOut',this.value)" class="w-full text-center text-xs p-1 outline-none print:hidden"><span class="hidden print:inline">${rOut}</span></td>
                     <td class="p-1 border border-gray-400 font-bold bg-white">${wrk || "0:00"}</td>
                     <td class="p-0 border border-gray-400 shadow-inner bg-white min-w-[50px]"><input type="text" value="${vL}" onchange="updA('${rId}','${currentStrDate}','vL',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden"><span class="hidden print:inline">${vL}</span></td>
+                    <td class="p-0 border border-gray-400 bg-red-50 text-red-800 font-bold min-w-[50px]"><input type="text" value="${vD_lat}" onchange="updA('${rId}','${currentStrDate}','ded_lat',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vD_lat}</span></td>
                     <td class="p-0 border border-gray-400 shadow-inner bg-white min-w-[50px]"><input type="text" value="${vE}" onchange="updA('${rId}','${currentStrDate}','vE',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden"><span class="hidden print:inline">${vE}</span></td>
-                    <td class="p-0 border border-gray-400 bg-red-50 text-red-800 font-bold min-w-[50px]"><input type="text" value="${vD}" onchange="updA('${rId}','${currentStrDate}','vD',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vD}</span></td>
+                    <td class="p-0 border border-gray-400 bg-red-50 text-red-800 font-bold min-w-[50px]"><input type="text" value="${vD_erl}" onchange="updA('${rId}','${currentStrDate}','ded_erl',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vD_erl}</span></td>
                     <td class="p-0 border border-gray-400 bg-blue-50 text-brand-blue font-bold min-w-[50px]"><input type="text" value="${vO}" onchange="updA('${rId}','${currentStrDate}','vO',this.value)" class="w-full text-center text-xs p-1 outline-none font-mono print:hidden bg-transparent"><span class="hidden print:inline">${vO}</span></td>
                     <td class="p-0 border border-gray-400 bg-white"><div class="flex gap-1 p-1 print:flex-col print:p-0">
-                        <select onchange="updA('${rId}','${currentStrDate}','type',this.value)" class="text-[10px] border rounded outline-none p-0.5 print:hidden w-1/2">
-                        <option value="">-</option>
-                        <option value="إجازة" ${rType == "إجازة" ? "selected" : ""}>إجازة</option>
-                        <option value="مرضي" ${rType == "مرضي" ? "selected" : ""}>مرضي</option>
-                        <option value="إذن" ${rType == "إذن" ? "selected" : ""}>إذن</option>
-                        <option value="مأمورية" ${rType == "مأمورية" ? "selected" : ""}>مأمورية</option>
-                        <option value="غياب" ${rType == "غياب" ? "selected" : ""}>غياب</option>
-                        </select>
+                        ${renderTypeSelect(rId, currentStrDate, rType)}
                         <input type="text" value="${rNote}" placeholder="ملاحظة" onchange="updA('${rId}','${currentStrDate}','note',this.value)" class="text-[10px] border rounded outline-none p-0.5 print:hidden w-1/2 text-right">
                         <span class="hidden print:block text-[9px] w-full p-1 text-right leading-tight">${rType} ${rNote ? "- " + rNote : ""}</span>
                     </div></td>

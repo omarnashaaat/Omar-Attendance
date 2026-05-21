@@ -1,6 +1,8 @@
 {
-  "name": "Omar Attendance",
+  "name": "Remix: Omar Attendance",
   "description": "Omar Attendance - Employee presence parsing and reports",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
